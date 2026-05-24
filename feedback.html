@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THREADS — Reviews & Feedback</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #0a0a0a;
+      --white: #f5f2ed;
+      --gold: #c9a84c;
+      --gold-light: #e8d49a;
+      --grey: #6b6b6b;
+      --grey-light: #d4cfc8;
+      --red: #b83232;
+      --green: #3a7a4a;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--black); color: var(--white);
+      font-family: 'Cormorant Garamond', serif;
+      cursor: none; overflow-x: hidden;
+    }
+    .cursor {
+      position: fixed; width: 10px; height: 10px;
+      background: var(--gold); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%, -50%); transition: transform 0.15s ease;
+    }
+    .cursor-ring {
+      position: fixed; width: 36px; height: 36px;
+      border: 1px solid var(--gold); border-radius: 50%;
+      pointer-events: none; z-index: 9998; opacity: 0.6;
+      transform: translate(-50%, -50%);
+    }
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: var(--black); }
+    ::-webkit-scrollbar-thumb { background: var(--gold); }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 24px 48px;
+      background: rgba(10,10,10,0.97); border-bottom: 1px solid #141414;
+    }
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif; font-size: 2rem;
+      letter-spacing: 0.25em; color: var(--white); text-decoration: none;
+    }
+    .nav-logo span { color: var(--gold); }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      font-family: 'Space Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--grey-light); text-decoration: none; transition: color 0.3s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--gold); }
+    .nav-shop {
+      font-family: 'Space Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      background: var(--gold); color: var(--black);
+      border: none; padding: 8px 20px; cursor: none;
+      font-weight: 700; text-decoration: none; display: inline-block;
+      transition: opacity 0.3s;
+    }
+    .nav-shop:hover { opacity: 0.85; }
+
+    /* PAGE HEADER */
+    .page-header {
+      padding: 140px 48px 80px;
+      position: relative; overflow: hidden;
+      border-bottom: 1px solid #141414;
+    }
+    .page-header-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 80% 50%, rgba(201,168,76,0.06) 0%, transparent 65%);
+    }
+    .breadcrumb {
+      font-family: 'Space Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey);
+      margin-bottom: 24px; display: flex; align-items: center; gap: 12px;
+    }
+    .breadcrumb a { color: var(--grey); text-decoration: none; transition: color 0.3s; }
+    .breadcrumb a:hover { color: var(--gold); }
+    .breadcrumb span { color: var(--gold); }
+    .page-header h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3rem, 8vw, 7rem); letter-spacing: 0.04em;
+      line-height: 0.9; position: relative; z-index: 1;
+    }
+    .page-header h1 em {
+      font-family: 'Cormorant Garamond', serif; font-style: italic;
+      font-weight: 300; color: var(--gold); display: block; font-size: 0.55em;
+    }
+    .page-header-sub {
+      font-size: 1rem; font-weight: 300; color: var(--grey-light);
+      max-width: 500px; line-height: 1.7; margin-top: 24px; position: relative; z-index: 1;
+    }
+    .header-word {
+      position: absolute; right: -20px; top: 50%; transform: translateY(-50%);
+      font-family: 'Bebas Neue', sans-serif; font-size: 18vw;
+      color: transparent; -webkit-text-stroke: 1px rgba(201,168,76,0.07);
+      pointer-events: none; user-select: none; line-height: 1;
+    }
+
+    /* SUMMARY STATS */
+    .stats-bar {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      border-bottom: 1px solid #141414;
+    }
+    .stat-cell {
+      padding: 40px 48px; border-right: 1px solid #141414;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .stat-cell:last-child { border-right: none; }
+    .stat-big {
+      font-family: 'Bebas Neue', sans-serif; font-size: 3.5rem;
+      color: var(--gold); line-height: 1;
+    }
+    .stat-sub {
+      font-family: 'Space Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey);
+    }
+    .stat-stars { color: var(--gold); font-size: 1rem; letter-spacing: 4px; }
+
+    /* RATING BREAKDOWN */
+    .rating-breakdown {
+      display: flex; flex-direction: column; gap: 10px; margin-top: 8px;
+    }
+    .rating-row {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .rating-row-label {
+      font-family: 'Space Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.1em; color: var(--grey); width: 12px; text-align: right;
+    }
+    .rating-bar-track {
+      flex: 1; height: 3px; background: #1e1e1e; border-radius: 2px; overflow: hidden;
+    }
+    .rating-bar-fill {
+      height: 100%; background: var(--gold); border-radius: 2px;
+      transition: width 1.2s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .rating-row-count {
+      font-family: 'Space Mono', monospace; font-size: 0.6rem;
+      color: var(--grey); width: 24px;
+    }
+
+    /* MAIN LAYOUT */
+    .main {
+      display: grid; grid-template-columns: 2fr 1fr;
+      gap: 0;
+      align-items: start;
+    }
+
+    /* REVIEWS LIST */
+    .reviews-list { border-right: 1px solid #141414; }
+    .reviews-toolbar {
+      padding: 28px 48px; border-bottom: 1px solid #141414;
+      display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    }
+    .filter-tabs { display: flex; gap: 0; }
+    .filter-tab {
+      font-family: 'Space Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      background: none; border: 1px solid #222;
+      color: var(--grey); padding: 8px 20px; cursor: none;
+      transition: all 0.3s; margin-right: -1px;
+    }
+    .filter-tab.active { border-color: var(--gold); color: var(--gold); z-index: 1; }
+    .filter-tab:hover { color: var(--white); border-color: #444; }
+    .sort-select {
+      font-family: 'Space Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      background: #111; border: 1px solid #222;
+      color: var(--grey-light); padding: 8px 16px;
+      outline: none; cursor: none;
+    }
+
+    /* REVIEW CARD */
+    .review-card {
+      padding: 40px 48px;
+      border-bottom: 1px solid #141414;
+      transition: background 0.3s;
+    }
+    .review-card:hover { background: #0d0d0d; }
+    .review-top {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .reviewer-info { display: flex; flex-direction: column; gap: 4px; }
+    .reviewer-name {
+      font-family: 'Space Mono', monospace; font-size: 0.75rem;
+      letter-spacing: 0.1em; text-transform: uppercase; color: var(--white);
+    }
+    .reviewer-meta {
+      font-family: 'Space Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.1em; color: var(--grey);
+    }
+    .review-stars { color: var(--gold); font-size: 0.9rem; letter-spacing: 3px; }
+    .review-product {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #141414; border: 1px solid #1e1e1e;
+      padding: 5px 14px; margin-bottom: 16px;
+    }
+    .review-product-brand {
+      font-family: 'Space Mono', monospace; font-size: 0.55rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold);
+    }
+    .review-product-name {
+      font-family: 'Space Mono', monospace; font-size: 0.55rem;
+      letter-spacing: 0.1em; color: var(--grey-light);
+    }
+    .review-title {
+      font-size: 1.2rem; font-weight: 600; margin-bottom: 10px; color: var(--white);
+    }
+    .review-body {
+      font-size: 0.98rem; font-weight: 300; color: var(--grey-light);
+      line-height: 1.8; margin-bottom: 20px;
+    }
+    .review-footer {
+      display: flex; align-items: center; gap: 20px;
+    }
+    .helpful-btn {
+      font-family: 'Space Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      background: none; border: 1px solid #222; color: var(--grey);
+      padding: 6px 16px; cursor: none; transition: all 0.3s; display: flex; align-items: center; gap: 8px;
+    }
+    .helpful-btn:hover { border-color: var(--gold); color: var(--gold); }
+    .helpful-btn.voted { border-color: var(--gold); color: var(--gold); }
+    .verified-badge {
+      font-family: 'Space Mono', monospace; font-size: 0.55rem;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      color: var(--green); display: flex; align-items: center; gap: 5px;
+    }
+
+    /* SIDEBAR: FORM */
+    .sidebar { padding: 40px 40px; position: sticky; top: 88px; }
+    .sidebar-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: 2rem;
+      letter-spacing: 0.06em; margin-bottom: 6px;
+    }
+    .sidebar-sub {
+      font-family: 'Space Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.15em; text-transform: uppercase; color: var(--grey);
+      margin-bottom: 36px;
+    }
+    .form-group { margin-bottom: 22px; }
+    .form-label {
+      font-family: 'Space Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.18em; text-transform: uppercase; color: var(--grey-light);
+      display: block; margin-bottom: 8px;
+    }
+    .form-label span { color: var(--gold); }
+    .form-input, .form-select, .form-textarea {
+      width: 100%; background: #111; border: 1px solid #222;
+      color: var(--white); padding: 12px 16px;
+      font-family: 'Cormorant Garamond', serif; font-size: 1rem;
+      outline: none; transition: border-color 0.3s;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--gold); }
+    .form-input::placeholder, .form-textarea::placeholder { color: var(--grey); }
+    .form-textarea { resize: vertical; min-height: 110px; }
+    .form-select { cursor: none; }
+    .form-select option { background: #111; }
+
+    /* STAR RATING INPUT */
+    .star-input { display: flex; gap: 6px; flex-direction: row-reverse; justify-content: flex-end; }
+    .star-input input { display: none; }
+    .star-input label {
+      font-size: 1.6rem; color: #2a2a2a; cursor: none;
+      transition: color 0.2s; line-height: 1;
+    }
+    .star-input label:hover,
+    .star-input label:hover ~ label,
+    .star-input input:checked ~ label { color: var(--gold); }
+
+    .submit-btn {
+      width: 100%;
+      font-family: 'Space Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      background: var(--gold); color: var(--black);
+      border: none; padding: 16px; cursor: none; font-weight: 700;
+      transition: opacity 0.3s, transform 0.2s; margin-top: 8px;
+    }
+    .submit-btn:hover { opacity: 0.85; transform: translateY(-2px); }
+    .submit-btn:active { transform: translateY(0); }
+
+    .form-success {
+      display: none;
+      text-align: center; padding: 40px 20px;
+    }
+    .form-success-icon { font-size: 2.5rem; color: var(--gold); margin-bottom: 16px; }
+    .form-success-title {
+      font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem;
+      letter-spacing: 0.08em; margin-bottom: 8px;
+    }
+    .form-success-sub {
+      font-family: 'Space Mono', monospace; font-size: 0.62rem;
+      letter-spacing: 0.1em; color: var(--grey); line-height: 1.6;
+    }
+
+    /* DIVIDER */
+    .gold-divider {
+      height: 1px; background: linear-gradient(to right, transparent, var(--gold), transparent);
+      margin: 0; opacity: 0.4;
+    }
+
+    /* TOAST */
+    .toast {
+      position: fixed; bottom: 32px; right: 32px;
+      background: var(--gold); color: var(--black);
+      font-family: 'Space Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.1em; padding: 14px 24px;
+      z-index: 999; transform: translateY(100px); opacity: 0;
+      transition: transform 0.4s ease, opacity 0.4s; pointer-events: none;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* FOOTER */
+    footer { background: #060606; padding: 48px 48px 28px; border-top: 1px solid #141414; }
+    .footer-bottom {
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .footer-logo-sm {
+      font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem;
+      letter-spacing: 0.25em; text-decoration: none; color: var(--white);
+    }
+    .footer-logo-sm span { color: var(--gold); }
+    .footer-copy { font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; color: var(--grey); }
+    .footer-links-sm { display: flex; gap: 24px; }
+    .footer-links-sm a {
+      font-family: 'Space Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.15em; text-transform: uppercase; color: var(--grey);
+      text-decoration: none; transition: color 0.3s;
+    }
+    .footer-links-sm a:hover { color: var(--gold); }
+
+    /* RESPONSIVE */
+    @media (max-width: 960px) {
+      nav { padding: 20px 24px; }
+      .nav-links { display: none; }
+      .page-header { padding: 120px 24px 60px; }
+      .stats-bar { grid-template-columns: 1fr 1fr; }
+      .stat-cell { padding: 28px 24px; }
+      .main { grid-template-columns: 1fr; }
+      .reviews-list { border-right: none; }
+      .review-card { padding: 32px 24px; }
+      .reviews-toolbar { padding: 20px 24px; flex-wrap: wrap; }
+      .sidebar { padding: 40px 24px; position: static; border-top: 1px solid #141414; }
+      footer { padding: 40px 24px 24px; }
+    }
+    @media (max-width: 540px) {
+      .stats-bar { grid-template-columns: 1fr 1fr; }
+      .filter-tabs { flex-wrap: wrap; }
+      .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+  <div class="toast" id="toast"></div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">THRE<span>A</span>DS</a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="threads.html">Collection</a></li>
+      <li><a href="threads.html#brands">Brands</a></li>
+      <li><a href="feedback.html" class="active">Reviews</a></li>
+    </ul>
+    <a href="threads.html" class="nav-shop">Shop Now</a>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="page-header-bg"></div>
+    <div class="header-word">REVIEWS</div>
+    <div class="breadcrumb">
+      <a href="index.html">Home</a> / <span>Reviews</span>
+    </div>
+    <h1>
+      What Our<br>
+      <em>Customers Say</em>
+    </h1>
+    <p class="page-header-sub">Real people. Real opinions. Browse verified reviews from our community and share your own experience with THREADS.</p>
+  </div>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat-cell">
+      <div class="stat-big">4.8</div>
+      <div class="stat-stars">★★★★★</div>
+      <div class="stat-sub">Overall Rating</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-big">2,140</div>
+      <div class="stat-sub">Total Reviews</div>
+      <div class="rating-breakdown" id="ratingBars">
+        <div class="rating-row"><div class="rating-row-label">5</div><div class="rating-bar-track"><div class="rating-bar-fill" style="width:0%" data-w="82%"></div></div><div class="rating-row-count">82%</div></div>
+        <div class="rating-row"><div class="rating-row-label">4</div><div class="rating-bar-track"><div class="rating-bar-fill" style="width:0%" data-w="12%"></div></div><div class="rating-row-count">12%</div></div>
+        <div class="rating-row"><div class="rating-row-label">3</div><div class="rating-bar-track"><div class="rating-bar-fill" style="width:0%" data-w="4%"></div></div><div class="rating-row-count">4%</div></div>
+        <div class="rating-row"><div class="rating-row-label">2</div><div class="rating-bar-track"><div class="rating-bar-fill" style="width:0%" data-w="1%"></div></div><div class="rating-row-count">1%</div></div>
+        <div class="rating-row"><div class="rating-row-label">1</div><div class="rating-bar-track"><div class="rating-bar-fill" style="width:0%" data-w="1%"></div></div><div class="rating-row-count">1%</div></div>
+      </div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-big">98%</div>
+      <div class="stat-sub">Would Recommend</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-big">3</div>
+      <div class="stat-sub">Premium Brands Reviewed</div>
+    </div>
+  </div>
+
+  <div class="gold-divider"></div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+
+    <!-- REVIEWS LIST -->
+    <div class="reviews-list">
+      <div class="reviews-toolbar">
+        <div class="filter-tabs">
+          <button class="filter-tab active" data-filter="all" onclick="filterReviews(this)">All</button>
+          <button class="filter-tab" data-filter="eog" onclick="filterReviews(this)">EOG</button>
+          <button class="filter-tab" data-filter="plein" onclick="filterReviews(this)">Plein</button>
+          <button class="filter-tab" data-filter="polo" onclick="filterReviews(this)">Polo RL</button>
+          <button class="filter-tab" data-filter="5" onclick="filterReviews(this)">★ 5 Star</button>
+        </div>
+        <select class="sort-select" onchange="sortReviews(this.value)">
+          <option value="newest">Newest First</option>
+          <option value="highest">Highest Rated</option>
+          <option value="helpful">Most Helpful</option>
+        </select>
+      </div>
+
+      <div id="reviewsContainer">
+
+        <div class="review-card" data-brand="eog" data-rating="5">
+          <div class="review-top">
+            <div class="reviewer-info">
+              <div class="reviewer-name">Kgomotso M.</div>
+              <div class="reviewer-meta">Gaborone · May 2025</div>
+            </div>
+            <div class="review-stars">★★★★★</div>
+          </div>
+          <div class="review-product">
+            <div class="review-product-brand">Essentials of God</div>
+            <div class="review-product-name">— The Scripture Tee</div>
+          </div>
+          <div class="review-title">This tee changed the way I dress</div>
+          <div class="review-body">From the moment I put it on, I could feel the quality difference. The cotton weight is perfect — not too heavy, not too light. The gold lettering on the front is crisp and the message is something I'm proud to wear every day. This is not just a T-shirt, it's a statement of faith done with taste.</div>
+          <div class="review-footer">
+            <button class="helpful-btn" onclick="markHelpful(this)">👍 Helpful <span class="count">24</span></button>
+            <div class="verified-badge">✓ Verified Purchase</div>
+          </div>
+        </div>
+
+        <div class="review-card" data-brand="plein" data-rating="5">
+          <div class="review-top">
+            <div class="reviewer-info">
+              <div class="reviewer-name">Mpho R.</div>
+              <div class="reviewer-meta">Johannesburg · April 2025</div>
+            </div>
+            <div class="review-stars">★★★★★</div>
+          </div>
+          <div class="review-product">
+            <div class="review-product-brand">Philipp Plein</div>
+            <div class="review-product-name">— Crystal Skull Statement Tee</div>
+          </div>
+          <div class="review-title">Pure audacity in fabric form</div>
+          <div class="review-body">I was skeptical about spending this much on a T-shirt, but the Philipp Plein arrived and genuinely took my breath away. The skull embroidery is incredibly intricate — the crystals catch the light in the most dramatic way. I wore it out and got stopped three times for compliments. Worth every cent.</div>
+          <div class="review-footer">
+            <button class="helpful-btn" onclick="markHelpful(this)">👍 Helpful <span class="count">38</span></button>
+            <div class="verified-badge">✓ Verified Purchase</div>
+          </div>
+        </div>
+
+        <div class="review-card" data-brand="polo" data-rating="4">
+          <div class="review-top">
+            <div class="reviewer-info">
+              <div class="reviewer-name">Lesego D.</div>
+              <div class="reviewer-meta">Cape Town · April 2025</div>
+            </div>
+            <div class="review-stars">★★★★☆</div>
+          </div>
+          <div class="review-product">
+            <div class="review-product-brand">Polo Ralph Lauren</div>
+            <div class="review-product-name">— Classic Sport Polo Tee</div>
+          </div>
+          <div class="review-title">Timeless. Every single time.</div>
+          <div class="review-body">I've been buying Polo Ralph Lauren for years and this piece lives up to the legacy. The piqué fabric is structured without being stiff, the polo pony embroidery is sharp, and the fit is exactly what I expect from RL. Docking one star only because I wished they had more colour options available. Delivery was fast and packaging was beautiful.</div>
+          <div class="review-footer">
+            <button class="helpful-btn" onclick="markHelpful(this)">👍 Helpful <span class="count">17</span></button>
+            <div class="verified-badge">✓ Verified Purchase</div>
+          </div>
+        </div>
+
+        <div class="review-card" data-brand="eog" data-rating="5">
+          <div class="review-top">
+            <div class="reviewer-info">
+              <div class="reviewer-name">Thabo K.</div>
+              <div class="reviewer-meta">Pretoria · March 2025</div>
+            </div>
+            <div class="review-stars">★★★★★</div>
+          </div>
+          <div class="review-product">
+            <div class="review-product-brand">Essentials of God</div>
+            <div class="review-product-name">— "God Is Good" Serif Tee</div>
+          </div>
+          <div class="review-title">My new favourite piece in my wardrobe</div>
+          <div class="review-body">The tobacco colourway is stunning in person — the photos don't do it justice. The italic "Good" script is clean and elegant. I've washed it six times and it hasn't faded at all. The oversized fit is exactly right. This brand genuinely understands how to merge faith and fashion without making it look cheap or preachy.</div>
+          <div class="review-footer">
+            <button class="helpful-btn" onclick="markHelpful(this)">👍 Helpful <span class="count">31</span></button>
+            <div class="verified-badge">✓ Verified Purchase</div>
+          </div>
+        </div>
+
+        <div class="review-card" data-brand="plein" data-rating="5">
+          <div class="review-top">
+            <div class="reviewer-info">
+              <div class="reviewer-name">Naledi S.</div>
+              <div class="reviewer-meta">Durban · March 2025</div>
+            </div>
+            <div class="review-stars">★★★★★</div>
+          </div>
+          <div class="review-product">
+            <div class="review-product-brand">Philipp Plein</div>
+            <div class="review-product-name">— Gold Skull Couture Tee</div>
+          </div>
+          <div class="review-title">Luxury that actually delivers</div>
+          <div class="review-body">Ordered the Gold Skull and it arrived in a beautiful box — the unboxing alone felt premium. The tee itself is a heavy, luxurious cotton with flawless gold skull detailing. It's the kind of piece you save for special occasions. THREADS delivered it ahead of schedule and communicated perfectly throughout. Five stars without hesitation.</div>
+          <div class="review-footer">
+            <button class="helpful-btn" onclick="markHelpful(this)">👍 Helpful <span class="count">44</span></button>
+            <div class="verified-badge">✓ Verified Purchase</div>
+          </div>
+        </div>
+
+        <div class="review-card" data-brand="polo" data-rating="5">
+          <div class="review-top">
+            <div class="reviewer-info">
+              <div class="reviewer-name">Boitumelo A.</div>
+              <div class="reviewer-meta">Gaborone · February 2025</div>
+            </div>
+            <div class="review-stars">★★★★★</div>
+          </div>
+          <div class="review-product">
+            <div class="review-product-brand">Polo Ralph Lauren</div>
+            <div class="review-product-name">— Heritage Edition Forest</div>
+          </div>
+          <div class="review-title">Exactly what Ralph Lauren promises</div>
+          <div class="review-body">The Heritage forest green polo is one of the best pieces I own. The colour is rich, the embroidery is perfect, and the fit is elegant without being tight. I've paired it with chinos, with denim, even with a blazer — it works for everything. THREADS made the ordering process completely seamless. Will definitely return.</div>
+          <div class="review-footer">
+            <button class="helpful-btn" onclick="markHelpful(this)">👍 Helpful <span class="count">19</span></button>
+            <div class="verified-badge">✓ Verified Purchase</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SIDEBAR: WRITE A REVIEW -->
+    <div class="sidebar">
+      <div class="sidebar-title">Write a Review</div>
+      <div class="sidebar-sub">Share your experience</div>
+
+      <div id="reviewForm">
+        <div class="form-group">
+          <label class="form-label" for="fname">Your Name <span>*</span></label>
+          <input class="form-input" id="fname" type="text" placeholder="e.g. Kgomotso M.">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="femail">Email Address <span>*</span></label>
+          <input class="form-input" id="femail" type="email" placeholder="your@email.com">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="fproduct">Product Reviewed <span>*</span></label>
+          <select class="form-select" id="fproduct">
+            <option value="">Select a product...</option>
+            <optgroup label="Essentials of God">
+              <option>The Scripture Tee — Black</option>
+              <option>"God Is Good" Serif Tee</option>
+              <option>Faith Over Fear Night Tee</option>
+            </optgroup>
+            <optgroup label="Philipp Plein">
+              <option>Crystal Skull Statement Tee</option>
+              <option>Gold Skull Couture Tee</option>
+            </optgroup>
+            <optgroup label="Polo Ralph Lauren">
+              <option>Classic Sport Polo Tee</option>
+              <option>Custom Fit Piqué Polo White</option>
+              <option>Heritage Edition — Forest</option>
+            </optgroup>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Your Rating <span>*</span></label>
+          <div class="star-input">
+            <input type="radio" id="s5" name="rating" value="5"><label for="s5" title="5 stars">★</label>
+            <input type="radio" id="s4" name="rating" value="4"><label for="s4" title="4 stars">★</label>
+            <input type="radio" id="s3" name="rating" value="3"><label for="s3" title="3 stars">★</label>
+            <input type="radio" id="s2" name="rating" value="2"><label for="s2" title="2 stars">★</label>
+            <input type="radio" id="s1" name="rating" value="1"><label for="s1" title="1 star">★</label>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="ftitle">Review Title <span>*</span></label>
+          <input class="form-input" id="ftitle" type="text" placeholder="Summarise your experience...">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="fbody">Your Review <span>*</span></label>
+          <textarea class="form-textarea" id="fbody" placeholder="Tell us what you loved, how it fits, and whether you'd recommend it..."></textarea>
+        </div>
+
+        <button class="submit-btn" onclick="submitReview()">Submit Review</button>
+      </div>
+
+      <div class="form-success" id="formSuccess">
+        <div class="form-success-icon">✦</div>
+        <div class="form-success-title">Thank You!</div>
+        <div class="form-success-sub">Your review has been submitted and is pending approval. We appreciate you sharing your experience with THREADS.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-bottom">
+      <a href="index.html" class="footer-logo-sm">THRE<span>A</span>DS</a>
+      <div class="footer-copy">© 2025 THREADS. ALL RIGHTS RESERVED.</div>
+      <div class="footer-links-sm">
+        <a href="index.html">Home</a>
+        <a href="threads.html">Shop</a>
+        <a href="feedback.html">Reviews</a>
+        <a href="#">Privacy</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Cursor
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+    });
+    (function animRing() {
+      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+      requestAnimationFrame(animRing);
+    })();
+    document.querySelectorAll('a, button, select, input, textarea, label').forEach(el => {
+      el.addEventListener('mouseenter', () => { cursor.style.transform = 'translate(-50%,-50%) scale(2.2)'; ring.style.opacity = '0'; });
+      el.addEventListener('mouseleave', () => { cursor.style.transform = 'translate(-50%,-50%) scale(1)'; ring.style.opacity = '0.6'; });
+    });
+
+    // Animate rating bars on load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.querySelectorAll('.rating-bar-fill').forEach(bar => {
+          bar.style.width = bar.dataset.w;
+        });
+      }, 400);
+    });
+
+    // Filter reviews
+    function filterReviews(btn) {
+      document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+      const f = btn.dataset.filter;
+      document.querySelectorAll('.review-card').forEach(card => {
+        if (f === 'all') { card.style.display = ''; return; }
+        if (f === '5') { card.style.display = card.dataset.rating === '5' ? '' : 'none'; return; }
+        card.style.display = card.dataset.brand === f ? '' : 'none';
+      });
+    }
+
+    // Sort reviews (visual only — toggles order in DOM)
+    function sortReviews(val) {
+      const container = document.getElementById('reviewsContainer');
+      const cards = Array.from(container.querySelectorAll('.review-card'));
+      if (val === 'highest') {
+        cards.sort((a, b) => parseInt(b.dataset.rating) - parseInt(a.dataset.rating));
+      } else if (val === 'helpful') {
+        cards.sort((a, b) => parseInt(b.querySelector('.count').textContent) - parseInt(a.querySelector('.count').textContent));
+      } else {
+        cards.sort((a, b) => cards.indexOf(a) - cards.indexOf(b));
+      }
+      cards.forEach(c => container.appendChild(c));
+    }
+
+    // Helpful button
+    function markHelpful(btn) {
+      if (btn.classList.contains('voted')) return;
+      btn.classList.add('voted');
+      const c = btn.querySelector('.count');
+      c.textContent = parseInt(c.textContent) + 1;
+      showToast('Marked as helpful ✓');
+    }
+
+    // Submit review
+    function submitReview() {
+      const name = document.getElementById('fname').value.trim();
+      const email = document.getElementById('femail').value.trim();
+      const product = document.getElementById('fproduct').value;
+      const rating = document.querySelector('input[name="rating"]:checked');
+      const title = document.getElementById('ftitle').value.trim();
+      const body = document.getElementById('fbody').value.trim();
+
+      if (!name || !email || !product || !rating || !title || !body) {
+        showToast('Please fill in all required fields'); return;
+      }
+      if (!email.includes('@')) { showToast('Please enter a valid email'); return; }
+
+      // Inject new review into list
+      const stars = '★'.repeat(parseInt(rating.value)) + '☆'.repeat(5 - parseInt(rating.value));
+      const brandMap = { 'The Scripture Tee — Black': 'eog', '"God Is Good" Serif Tee': 'eog', 'Faith Over Fear Night Tee': 'eog', 'Crystal Skull Statement Tee': 'plein', 'Gold Skull Couture Tee': 'plein', 'Classic Sport Polo Tee': 'polo', 'Custom Fit Piqué Polo White': 'polo', 'Heritage Edition — Forest': 'polo' };
+      const brandLabel = { eog: 'Essentials of God', plein: 'Philipp Plein', polo: 'Polo Ralph Lauren' };
+      const bKey = brandMap[product] || 'eog';
+
+      const card = document.createElement('div');
+      card.className = 'review-card'; card.dataset.brand = bKey; card.dataset.rating = rating.value;
+      card.innerHTML = `
+        <div class="review-top">
+          <div class="reviewer-info">
+            <div class="reviewer-name">${name}</div>
+            <div class="reviewer-meta">Just now · Pending approval</div>
+          </div>
+          <div class="review-stars">${stars}</div>
+        </div>
+        <div class="review-product">
+          <div class="review-product-brand">${brandLabel[bKey]}</div>
+          <div class="review-product-name">— ${product}</div>
+        </div>
+        <div class="review-title">${title}</div>
+        <div class="review-body">${body}</div>
+        <div class="review-footer">
+          <button class="helpful-btn" onclick="markHelpful(this)">👍 Helpful <span class="count">0</span></button>
+          <div class="verified-badge">⏳ Pending</div>
+        </div>`;
+
+      const container = document.getElementById('reviewsContainer');
+      container.insertBefore(card, container.firstChild);
+
+      document.getElementById('reviewForm').style.display = 'none';
+      document.getElementById('formSuccess').style.display = 'block';
+      showToast('Review submitted successfully ✓');
+    }
+
+    // Toast
+    const toast = document.getElementById('toast');
+    let toastTimer;
+    function showToast(msg) {
+      toast.textContent = msg; toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2800);
+    }
+  </script>
+</body>
+</html>

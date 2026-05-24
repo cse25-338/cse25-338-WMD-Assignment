@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THREADS — Premium T-Shirts</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --white: #f5f2ed;
+      --cream: #ede8e0;
+      --gold: #c9a84c;
+      --gold-light: #e8d49a;
+      --grey: #6b6b6b;
+      --grey-light: #d4cfc8;
+      --red: #b83232;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Cormorant Garamond', serif;
+      cursor: none;
+      overflow-x: hidden;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      position: fixed;
+      width: 10px; height: 10px;
+      background: var(--gold);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.15s ease;
+      transform: translate(-50%, -50%);
+    }
+    .cursor-ring {
+      position: fixed;
+      width: 36px; height: 36px;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transition: transform 0.35s cubic-bezier(0.23, 1, 0.32, 1), opacity 0.3s;
+      transform: translate(-50%, -50%);
+      opacity: 0.6;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: var(--black); }
+    ::-webkit-scrollbar-thumb { background: var(--gold); }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 24px 48px;
+      background: linear-gradient(to bottom, rgba(10,10,10,0.98), transparent);
+      backdrop-filter: blur(2px);
+    }
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 0.25em;
+      color: var(--white);
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--gold); }
+    .nav-links {
+      display: flex; gap: 36px; list-style: none;
+    }
+    .nav-links a {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--grey-light);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-right {
+      display: flex; align-items: center; gap: 20px;
+    }
+    .cart-btn {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      background: none;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 8px 20px;
+      cursor: none;
+      transition: background 0.3s, color 0.3s;
+    }
+    .cart-btn:hover { background: var(--gold); color: var(--black); }
+
+    /* HERO */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 120px 48px 80px 48px;
+      position: relative;
+      z-index: 2;
+    }
+    .hero-eyebrow {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 28px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 40px; height: 1px;
+      background: var(--gold);
+    }
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(4rem, 9vw, 8rem);
+      line-height: 0.92;
+      letter-spacing: 0.02em;
+      color: var(--white);
+      margin-bottom: 28px;
+    }
+    .hero-title em {
+      font-style: italic;
+      font-family: 'Cormorant Garamond', serif;
+      font-weight: 300;
+      color: var(--gold);
+      font-size: 0.85em;
+    }
+    .hero-sub {
+      font-size: 1.1rem;
+      font-weight: 300;
+      color: var(--grey-light);
+      line-height: 1.7;
+      max-width: 380px;
+      margin-bottom: 48px;
+    }
+    .hero-cta {
+      display: flex; gap: 16px; flex-wrap: wrap;
+    }
+    .btn-primary {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      background: var(--gold);
+      color: var(--black);
+      border: none;
+      padding: 16px 36px;
+      cursor: none;
+      font-weight: 700;
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .btn-primary:hover { opacity: 0.85; transform: translateY(-2px); }
+    .btn-outline {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      background: transparent;
+      color: var(--white);
+      border: 1px solid var(--grey);
+      padding: 16px 36px;
+      cursor: none;
+      transition: border-color 0.3s, color 0.3s;
+    }
+    .btn-outline:hover { border-color: var(--white); }
+
+    .hero-right {
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-img-wrap {
+      position: absolute; inset: 0;
+    }
+    .hero-bg-shape {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 420px; height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,168,76,0.12) 0%, transparent 70%);
+    }
+    .hero-tshirt {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .tshirt-visual {
+      width: 320px;
+      animation: floatUp 4s ease-in-out infinite;
+    }
+    @keyframes floatUp {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-18px); }
+    }
+
+    /* Hero lines decoration */
+    .hero-lines {
+      position: absolute;
+      bottom: 40px; left: 48px;
+      display: flex; gap: 8px;
+    }
+    .hero-line {
+      height: 2px;
+      background: var(--gold);
+      animation: lineGrow 1.2s ease forwards;
+      animation-fill-mode: both;
+    }
+    .hero-line:nth-child(1) { width: 40px; animation-delay: 0.4s; }
+    .hero-line:nth-child(2) { width: 20px; animation-delay: 0.6s; }
+    .hero-line:nth-child(3) { width: 10px; animation-delay: 0.8s; }
+    @keyframes lineGrow { from { transform: scaleX(0); transform-origin: left; } to { transform: scaleX(1); } }
+
+    /* MARQUEE */
+    .marquee-strip {
+      background: var(--gold);
+      padding: 14px 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .marquee-inner {
+      display: inline-flex;
+      animation: marqueeScroll 18s linear infinite;
+    }
+    .marquee-item {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1rem;
+      letter-spacing: 0.25em;
+      color: var(--black);
+      padding: 0 40px;
+    }
+    .marquee-dot {
+      font-size: 0.5rem;
+      vertical-align: middle;
+      opacity: 0.5;
+    }
+    @keyframes marqueeScroll {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* BRANDS SECTION */
+    .section { padding: 100px 48px; }
+    .section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 16px;
+      display: flex; align-items: center; gap: 16px;
+    }
+    .section-label::before {
+      content: '';
+      display: block;
+      width: 30px; height: 1px;
+      background: var(--gold);
+    }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      line-height: 1;
+      letter-spacing: 0.03em;
+      margin-bottom: 60px;
+    }
+
+    /* BRAND TABS */
+    .brand-tabs {
+      display: flex; gap: 0;
+      border-bottom: 1px solid #222;
+      margin-bottom: 60px;
+    }
+    .brand-tab {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--grey);
+      padding: 16px 32px;
+      cursor: none;
+      transition: color 0.3s, border-color 0.3s;
+      margin-bottom: -1px;
+    }
+    .brand-tab.active {
+      color: var(--gold);
+      border-bottom-color: var(--gold);
+    }
+    .brand-tab:hover { color: var(--white); }
+
+    /* PRODUCT GRID */
+    .product-panel { display: none; }
+    .product-panel.active { display: block; }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 2px;
+    }
+    .product-card {
+      position: relative;
+      background: #111;
+      overflow: hidden;
+      display: flex;
+    }
+    .product-img {
+      width: 100%;
+      aspect-ratio: 3/4;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+      background: #1a1a1a;
+    }
+    .product-card:hover .product-img { transform: scale(1.06); }
+
+    /* SVG placeholder shirt */
+    .shirt-placeholder {
+      width: 100%;
+      aspect-ratio: 3/4;
+      background: #161616;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+      transition: transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .product-card:hover .shirt-placeholder { transform: scale(1.04); }
+
+    .product-overlay {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: linear-gradient(to top, rgba(10,10,10,0.97) 0%, transparent 100%);
+      padding: 40px 24px 24px;
+      transform: translateY(30%);
+      transition: transform 0.4s ease;
+    }
+    .product-card:hover .product-overlay { transform: translateY(0); }
+
+    .product-brand {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 6px;
+    }
+    .product-name {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.2rem;
+      font-weight: 400;
+      margin-bottom: 4px;
+    }
+    .product-price {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--grey-light);
+      margin-bottom: 16px;
+    }
+    .product-add {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      background: var(--gold);
+      color: var(--black);
+      border: none;
+      padding: 10px 20px;
+      cursor: none;
+      width: 100%;
+      font-weight: 700;
+      transition: opacity 0.3s;
+    }
+    .product-add:hover { opacity: 0.8; }
+
+    .product-badge {
+      position: absolute;
+      top: 20px; right: 20px;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 5px 10px;
+      z-index: 2;
+    }
+    .badge-new { background: var(--gold); color: var(--black); }
+    .badge-exclusive { background: var(--red); color: var(--white); }
+
+    /* BRAND STORY */
+    .brand-story {
+      background: #0f0f0f;
+      padding: 100px 48px;
+    }
+    .brand-story-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 2px;
+    }
+    .story-card {
+      padding: 48px 36px;
+      background: #141414;
+      border-top: 1px solid #222;
+      transition: border-color 0.3s, background 0.3s;
+    }
+    .story-card:hover { border-top-color: var(--gold); background: #181818; }
+    .story-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 5rem;
+      color: #1e1e1e;
+      line-height: 1;
+      margin-bottom: 20px;
+    }
+    .story-brand-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 1.8rem;
+      letter-spacing: 0.1em;
+      color: var(--white);
+      margin-bottom: 16px;
+    }
+    .story-brand-name span { color: var(--gold); }
+    .story-text {
+      font-size: 0.95rem;
+      font-weight: 300;
+      color: var(--grey-light);
+      line-height: 1.8;
+    }
+    .story-link {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      text-decoration: none;
+      display: flex; align-items: center; gap: 10px;
+      margin-top: 28px;
+      cursor: none;
+      transition: gap 0.3s;
+    }
+    .story-link:hover { gap: 16px; }
+    .story-link::after { content: '→'; }
+
+    /* FEATURES STRIP */
+    .features-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+      border-top: 1px solid #1e1e1e;
+      border-bottom: 1px solid #1e1e1e;
+    }
+    .feature-item {
+      padding: 40px 36px;
+      border-right: 1px solid #1e1e1e;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .feature-item:last-child { border-right: none; }
+    .feature-icon {
+      font-size: 1.5rem;
+      line-height: 1;
+    }
+    .feature-title {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+    .feature-desc {
+      font-size: 0.9rem;
+      font-weight: 300;
+      color: var(--grey);
+      line-height: 1.6;
+    }
+
+    /* NEWSLETTER */
+    .newsletter {
+      padding: 100px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .newsletter::before {
+      content: 'THREADS';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20vw;
+      color: #111;
+      white-space: nowrap;
+      pointer-events: none;
+      letter-spacing: 0.05em;
+    }
+    .newsletter-content { position: relative; z-index: 1; }
+    .newsletter h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+    .newsletter p {
+      font-size: 1rem;
+      font-weight: 300;
+      color: var(--grey-light);
+      margin-bottom: 40px;
+    }
+    .newsletter-form {
+      display: flex;
+      max-width: 480px;
+      margin: 0 auto;
+      gap: 0;
+    }
+    .newsletter-input {
+      flex: 1;
+      background: #141414;
+      border: 1px solid #333;
+      border-right: none;
+      color: var(--white);
+      padding: 16px 24px;
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    .newsletter-input:focus { border-color: var(--gold); }
+    .newsletter-input::placeholder { color: var(--grey); }
+    .newsletter-submit {
+      background: var(--gold);
+      border: none;
+      color: var(--black);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      font-weight: 700;
+      padding: 16px 28px;
+      cursor: none;
+      white-space: nowrap;
+      transition: opacity 0.3s;
+    }
+    .newsletter-submit:hover { opacity: 0.85; }
+
+    /* FOOTER */
+    footer {
+      background: #060606;
+      padding: 60px 48px 32px;
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 48px;
+      padding-bottom: 48px;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    .footer-logo {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 2rem;
+      letter-spacing: 0.25em;
+      text-decoration: none;
+      color: var(--white);
+      display: block;
+      margin-bottom: 16px;
+    }
+    .footer-logo span { color: var(--gold); }
+    .footer-desc {
+      font-size: 0.9rem;
+      font-weight: 300;
+      color: var(--grey);
+      line-height: 1.7;
+      max-width: 240px;
+    }
+    .footer-col h4 {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-links a {
+      font-size: 0.9rem;
+      font-weight: 300;
+      color: var(--grey);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .footer-links a:hover { color: var(--white); }
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 28px;
+    }
+    .footer-copy {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.1em;
+      color: var(--grey);
+    }
+    .footer-socials { display: flex; gap: 16px; }
+    .footer-socials a {
+      font-family: 'Space Mono', monospace;
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--grey);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .footer-socials a:hover { color: var(--gold); }
+
+    /* PAGE LOAD ANIMATION */
+    .page-enter { opacity: 0; transform: translateY(20px); animation: enterUp 0.8s ease forwards; }
+    @keyframes enterUp { to { opacity: 1; transform: translateY(0); } }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.25s; }
+    .delay-3 { animation-delay: 0.4s; }
+    .delay-4 { animation-delay: 0.55s; }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 32px; right: 32px;
+      background: var(--gold);
+      color: var(--black);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      padding: 14px 24px;
+      z-index: 999;
+      transform: translateY(100px);
+      opacity: 0;
+      transition: transform 0.4s ease, opacity 0.4s;
+      pointer-events: none;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      nav { padding: 20px 24px; }
+      .nav-links { display: none; }
+      .hero { grid-template-columns: 1fr; min-height: auto; }
+      .hero-left { padding: 100px 24px 60px; }
+      .hero-right { display: none; }
+      .section { padding: 64px 24px; }
+      .brand-story { padding: 64px 24px; }
+      .brand-story-grid { grid-template-columns: 1fr; gap: 2px; }
+      .features-strip { grid-template-columns: 1fr 1fr; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+      .newsletter { padding: 64px 24px; }
+      footer { padding: 48px 24px 24px; }
+    }
+    @media (max-width: 540px) {
+      .features-strip { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr; }
+      .newsletter-form { flex-direction: column; }
+      .newsletter-input { border-right: 1px solid #333; border-bottom: none; }
+      .products-grid { grid-template-columns: 1fr 1fr; gap: 2px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Custom Cursor -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast">Added to cart ✓</div>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="nav-logo">THRE<span>A</span>DS</a>
+    <ul class="nav-links">
+      <li><a href="#collection">Collection</a></li>
+      <li><a href="#brands">Brands</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="cart-btn" onclick="showToast('Cart opened')">Bag (0)</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-left">
+      <div class="hero-eyebrow page-enter delay-1">2025 Premium Collection</div>
+      <h1 class="hero-title page-enter delay-2">
+        Wear What<br>You <em>Believe</em><br>In
+      </h1>
+      <p class="hero-sub page-enter delay-3">Curated premium T-shirts from the world's most sought-after labels. Essentials of God, Philipp Plein, Polo Ralph Lauren — iconic pieces for those who demand more.</p>
+      <div class="hero-cta page-enter delay-4">
+        <button class="btn-primary" onclick="document.getElementById('collection').scrollIntoView({behavior:'smooth'})">Shop Collection</button>
+        <button class="btn-outline" onclick="document.getElementById('brands').scrollIntoView({behavior:'smooth'})">Our Brands</button>
+      </div>
+      <div class="hero-lines">
+        <div class="hero-line"></div>
+        <div class="hero-line"></div>
+        <div class="hero-line"></div>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="hero-img-wrap">
+        <div class="hero-bg-shape"></div>
+        <div class="hero-tshirt">
+          <!-- SVG T-Shirt illustration -->
+          <svg class="tshirt-visual" viewBox="0 0 320 380" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="shirtGrad" x1="0" y1="0" x2="320" y2="380" gradientUnits="userSpaceOnUse">
+                <stop offset="0%" stop-color="#1e1e1e"/>
+                <stop offset="100%" stop-color="#111"/>
+              </linearGradient>
+              <linearGradient id="goldShine" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#c9a84c"/>
+                <stop offset="100%" stop-color="#e8d49a"/>
+              </linearGradient>
+            </defs>
+            <!-- Shirt body -->
+            <path d="M80 40 L20 90 L60 110 L60 340 L260 340 L260 110 L300 90 L240 40 Q200 20 160 20 Q120 20 80 40Z"
+              fill="url(#shirtGrad)" stroke="#2a2a2a" stroke-width="1.5"/>
+            <!-- Collar -->
+            <path d="M120 35 Q160 65 200 35 Q185 15 160 20 Q135 15 120 35Z"
+              fill="#181818" stroke="#2a2a2a" stroke-width="1"/>
+            <!-- Sleeve left -->
+            <path d="M80 40 L20 90 L60 110 L80 80Z" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1"/>
+            <!-- Sleeve right -->
+            <path d="M240 40 L300 90 L260 110 L240 80Z" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1"/>
+            <!-- Front graphic: abstract cross / monogram -->
+            <circle cx="160" cy="190" r="50" stroke="url(#goldShine)" stroke-width="0.8" fill="none" opacity="0.4"/>
+            <circle cx="160" cy="190" r="38" stroke="url(#goldShine)" stroke-width="0.4" fill="none" opacity="0.3"/>
+            <text x="160" y="198" text-anchor="middle" font-family="'Bebas Neue', sans-serif" font-size="28" fill="url(#goldShine)" opacity="0.9" letter-spacing="3">EOG</text>
+            <!-- Subtle texture lines -->
+            <line x1="80" y1="280" x2="240" y2="280" stroke="#1e1e1e" stroke-width="1"/>
+            <!-- Gold trim at hem -->
+            <line x1="60" y1="340" x2="260" y2="340" stroke="url(#goldShine)" stroke-width="2" opacity="0.6"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-strip">
+    <div class="marquee-inner">
+      <span class="marquee-item">Essentials of God</span><span class="marquee-item marquee-dot">✦</span>
+      <span class="marquee-item">Philipp Plein</span><span class="marquee-item marquee-dot">✦</span>
+      <span class="marquee-item">Polo Ralph Lauren</span><span class="marquee-item marquee-dot">✦</span>
+      <span class="marquee-item">Premium Tees</span><span class="marquee-item marquee-dot">✦</span>
+      <span class="marquee-item">Free Shipping Over $150</span><span class="marquee-item marquee-dot">✦</span>
+      <span class="marquee-item">Essentials of God</span><span class="marquee-item marquee-dot">✦</span>
+      <span class="marquee-item">Philipp Plein</span><span class="marquee-item marquee-dot">✦</span>
+      <span class="marquee-item">Polo Ralph Lauren</span><span class="marquee-item marquee-dot">✦</span>
+      <span class="marquee-item">Premium Tees</span><span class="marquee-item marquee-dot">✦</span>
+      <span class="marquee-item">Free Shipping Over $150</span><span class="marquee-item marquee-dot">✦</span>
+    </div>
+  </div>
+
+  <!-- FEATURES STRIP -->
+  <div class="features-strip">
+    <div class="feature-item">
+      <div class="feature-icon">✦</div>
+      <div class="feature-title">W3C Compliant</div>
+      <div class="feature-desc">Built to the highest web standards, fully valid HTML5, CSS3 & JS.</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">◎</div>
+      <div class="feature-title">All Browsers</div>
+      <div class="feature-desc">Chrome, Firefox, Safari, Opera — flawless across every browser.</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">▲</div>
+      <div class="feature-title">Mobile-First</div>
+      <div class="feature-desc">Fully responsive across all screen sizes and resolutions.</div>
+    </div>
+    <div class="feature-item">
+      <div class="feature-icon">⬡</div>
+      <div class="feature-title">Free Returns</div>
+      <div class="feature-desc">Hassle-free 30-day returns on all premium T-shirts.</div>
+    </div>
+  </div>
+
+  <!-- COLLECTION -->
+  <section class="section" id="collection">
+    <div class="section-label">Shop Now</div>
+    <h2 class="section-title">THE COLLECTION</h2>
+
+    <div class="brand-tabs">
+      <button class="brand-tab active" data-panel="all" onclick="switchTab(this)">All Pieces</button>
+      <button class="brand-tab" data-panel="eog" onclick="switchTab(this)">Essentials of God</button>
+      <button class="brand-tab" data-panel="plein" onclick="switchTab(this)">Philipp Plein</button>
+      <button class="brand-tab" data-panel="polo" onclick="switchTab(this)">Polo Ralph Lauren</button>
+    </div>
+
+    <!-- ALL PRODUCTS -->
+    <div class="product-panel active" id="panel-all">
+      <div class="products-grid">
+
+        <!-- EOG 1 -->
+        <div class="product-card">
+          <div class="shirt-placeholder">
+            <svg viewBox="0 0 240 300" width="180" xmlns="http://www.w3.org/2000/svg">
+              <path d="M58 28 L14 70 L44 85 L44 270 L196 270 L196 85 L226 70 L182 28 Q158 10 120 10 Q82 10 58 28Z" fill="#0e0e0e"/>
+              <path d="M58 28 L14 70 L44 85 L58 62Z" fill="#0d0d0d"/>
+              <path d="M182 28 L226 70 L196 85 L182 62Z" fill="#0d0d0d"/>
+              <path d="M92 26 Q120 52 148 26" stroke="#1a1a1a" stroke-width="1" fill="none"/>
+              <text x="120" y="158" text-anchor="middle" font-family="serif" font-size="14" fill="#c9a84c" letter-spacing="1" opacity="0.9">ESSENTIALS</text>
+              <text x="120" y="176" text-anchor="middle" font-family="serif" font-size="10" fill="#c9a84c" letter-spacing="2" opacity="0.7">OF GOD</text>
+              <line x1="80" y1="185" x2="160" y2="185" stroke="#c9a84c" stroke-width="0.5" opacity="0.4"/>
+              <text x="120" y="200" text-anchor="middle" font-family="serif" font-size="8" fill="#888" letter-spacing="3">EST. MMXXIII</text>
+            </svg>
+          </div>
+          <div class="product-badge badge-new">New</div>
+          <div class="product-overlay">
+            <div class="product-brand">Essentials of God</div>
+            <div class="product-name">The Scripture Tee — Black</div>
+            <div class="product-price">$89.00</div>
+            <button class="product-add" onclick="addToCart(this)">Add to Bag</button>
+          </div>
+        </div>
+
+        <!-- Plein 1 -->
+        <div class="product-card">
+          <div class="shirt-placeholder" style="background:#0c0c14;">
+            <svg viewBox="0 0 240 300" width="180" xmlns="http://www.w3.org/2000/svg">
+              <path d="M58 28 L14 70 L44 85 L44 270 L196 270 L196 85 L226 70 L182 28 Q158 10 120 10 Q82 10 58 28Z" fill="#0d0d1a"/>
+              <path d="M58 28 L14 70 L44 85 L58 62Z" fill="#0c0c16"/>
+              <path d="M182 28 L226 70 L196 85 L182 62Z" fill="#0c0c16"/>
+              <circle cx="120" cy="155" r="40" fill="none" stroke="#8888ff" stroke-width="0.5" opacity="0.3"/>
+              <text x="120" y="148" text-anchor="middle" font-family="sans-serif" font-size="22" font-weight="700" fill="white" letter-spacing="-1">PP</text>
+              <text x="120" y="164" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#aaa" letter-spacing="4">PHILIPP PLEIN</text>
+              <circle cx="120" cy="155" r="5" fill="#ff2244"/>
+              <line x1="44" y1="258" x2="196" y2="258" stroke="#ff2244" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <div class="product-badge badge-exclusive">Exclusive</div>
+          <div class="product-overlay">
+            <div class="product-brand">Philipp Plein</div>
+            <div class="product-name">Crystal Skull Statement Tee</div>
+            <div class="product-price">$320.00</div>
+            <button class="product-add" onclick="addToCart(this)">Add to Bag</button>
+          </div>
+        </div>
+
+        <!-- Polo 1 -->
+        <div class="product-card">
+          <div class="shirt-placeholder" style="background:#0a1020;">
+            <svg viewBox="0 0 240 300" width="180" xmlns="http://www.w3.org/2000/svg">
+              <path d="M58 28 L14 70 L44 85 L44 270 L196 270 L196 85 L226 70 L182 28 Q158 10 120 10 Q82 10 58 28Z" fill="#0d1428"/>
+              <path d="M58 28 L14 70 L44 85 L58 62Z" fill="#0c1226"/>
+              <path d="M182 28 L226 70 L196 85 L182 62Z" fill="#0c1226"/>
+              <text x="120" y="120" text-anchor="middle" font-family="serif" font-size="8" fill="#4a6fa5" letter-spacing="4">POLO</text>
+              <text x="120" y="134" text-anchor="middle" font-family="serif" font-size="7" fill="#4a6fa5" letter-spacing="3">RALPH LAUREN</text>
+              <!-- Polo player icon simplified -->
+              <ellipse cx="120" cy="175" rx="22" ry="22" fill="none" stroke="#4a6fa5" stroke-width="1" opacity="0.4"/>
+              <text x="120" y="180" text-anchor="middle" font-size="20" fill="#4a6fa5">🏇</text>
+              <line x1="80" y1="205" x2="160" y2="205" stroke="#4a6fa5" stroke-width="0.5" opacity="0.5"/>
+              <text x="120" y="220" text-anchor="middle" font-size="8" fill="#4a6fa5" font-family="serif" letter-spacing="2">SPORT</text>
+            </svg>
+          </div>
+          <div class="product-overlay">
+            <div class="product-brand">Polo Ralph Lauren</div>
+            <div class="product-name">Classic Sport Polo Tee</div>
+            <div class="product-price">$125.00</div>
+            <button class="product-add" onclick="addToCart(this)">Add to Bag</button>
+          </div>
+        </div>
+
+        <!-- EOG 2 -->
+        <div class="product-card">
+          <div class="shirt-placeholder" style="background:#1a1008;">
+            <svg viewBox="0 0 240 300" width="180" xmlns="http://www.w3.org/2000/svg">
+              <path d="M58 28 L14 70 L44 85 L44 270 L196 270 L196 85 L226 70 L182 28 Q158 10 120 10 Q82 10 58 28Z" fill="#1a1008"/>
+              <path d="M58 28 L14 70 L44 85 L58 62Z" fill="#180f07"/>
+              <path d="M182 28 L226 70 L196 85 L182 62Z" fill="#180f07"/>
+              <path d="M92 26 Q120 52 148 26" stroke="#2a1a08" stroke-width="1" fill="none"/>
+              <text x="120" y="145" text-anchor="middle" font-family="serif" font-size="10" fill="#c9a84c" letter-spacing="2">✦  GOD IS  ✦</text>
+              <text x="120" y="165" text-anchor="middle" font-family="serif" font-size="28" fill="#c9a84c" font-style="italic">Good</text>
+              <line x1="70" y1="180" x2="170" y2="180" stroke="#c9a84c" stroke-width="0.5" opacity="0.5"/>
+              <text x="120" y="198" text-anchor="middle" font-family="serif" font-size="8" fill="#888" letter-spacing="3">ESSENTIALS OF GOD</text>
+            </svg>
+          </div>
+          <div class="product-badge badge-new">New</div>
+          <div class="product-overlay">
+            <div class="product-brand">Essentials of God</div>
+            <div class="product-name">"God Is Good" Serif Tee</div>
+            <div class="product-price">$79.00</div>
+            <button class="product-add" onclick="addToCart(this)">Add to Bag</button>
+          </div>
+        </div>
+
+        <!-- Plein 2 -->
+        <div class="product-card">
+          <div class="shirt-placeholder" style="background:#111;">
+            <svg viewBox="0 0 240 300" width="180" xmlns="http://www.w3.org/2000/svg">
+              <path d="M58 28 L14 70 L44 85 L44 270 L196 270 L196 85 L226 70 L182 28 Q158 10 120 10 Q82 10 58 28Z" fill="#111"/>
+              <path d="M58 28 L14 70 L44 85 L58 62Z" fill="#0e0e0e"/>
+              <path d="M182 28 L226 70 L196 85 L182 62Z" fill="#0e0e0e"/>
+              <!-- Skull design -->
+              <ellipse cx="120" cy="148" rx="26" ry="24" fill="#222" stroke="#c9a84c" stroke-width="0.6"/>
+              <ellipse cx="113" cy="146" rx="6" ry="7" fill="#111"/>
+              <ellipse cx="127" cy="146" rx="6" ry="7" fill="#111"/>
+              <rect x="110" y="162" width="6" height="8" fill="#222" stroke="#c9a84c" stroke-width="0.5"/>
+              <rect x="118" y="162" width="6" height="8" fill="#222" stroke="#c9a84c" stroke-width="0.5"/>
+              <rect x="126" y="162" width="6" height="8" fill="#222" stroke="#c9a84c" stroke-width="0.5"/>
+              <text x="120" y="195" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#c9a84c" letter-spacing="4">PHILIPP PLEIN</text>
+            </svg>
+          </div>
+          <div class="product-overlay">
+            <div class="product-brand">Philipp Plein</div>
+            <div class="product-name">Gold Skull Couture Tee</div>
+            <div class="product-price">$285.00</div>
+            <button class="product-add" onclick="addToCart(this)">Add to Bag</button>
+          </div>
+        </div>
+
+        <!-- Polo 2 -->
+        <div class="product-card">
+          <div class="shirt-placeholder" style="background:#f5f2ed11;">
+            <svg viewBox="0 0 240 300" width="180" xmlns="http://www.w3.org/2000/svg">
+              <path d="M58 28 L14 70 L44 85 L44 270 L196 270 L196 85 L226 70 L182 28 Q158 10 120 10 Q82 10 58 28Z" fill="#f5f2ed10"/>
+              <path d="M58 28 L14 70 L44 85 L58 62Z" fill="#f5f2ed0a"/>
+              <path d="M182 28 L226 70 L196 85 L182 62Z" fill="#f5f2ed0a"/>
+              <path d="M92 26 Q120 52 148 26" stroke="#c9a84c" stroke-width="1.5" fill="#1a1a1a"/>
+              <text x="120" y="158" text-anchor="middle" font-family="serif" font-size="12" fill="#f5f2ed" letter-spacing="4">POLO</text>
+              <text x="120" y="175" text-anchor="middle" font-family="serif" font-size="8" fill="#f5f2ed" letter-spacing="3" opacity="0.7">RALPH LAUREN</text>
+              <rect x="106" y="183" width="28" height="1.5" fill="#c9a84c" opacity="0.7"/>
+              <text x="120" y="198" text-anchor="middle" font-family="serif" font-size="7" fill="#c9a84c" letter-spacing="4">CUSTOM FIT</text>
+            </svg>
+          </div>
+          <div class="product-badge badge-new">New</div>
+          <div class="product-overlay">
+            <div class="product-brand">Polo Ralph Lauren</div>
+            <div class="product-name">Custom Fit Piqué Polo White</div>
+            <div class="product-price">$140.00</div>
+            <button class="product-add" onclick="addToCart(this)">Add to Bag</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- EOG PANEL -->
+    <div class="product-panel" id="panel-eog">
+      <div class="products-grid">
+        <div class="product-card">
+          <div class="shirt-placeholder">
+            <svg viewBox="0 0 240 300" width="180" xmlns="http://www.w3.org/2000/svg">
+              <path d="M58 28 L14 70 L44 85 L44 270 L196 270 L196 85 L226 70 L182 28 Q158 10 120 10 Q82 10 58 28Z" fill="#0e0e0e"/>
+              <path d="M58 28 L14 70 L44 85 L58 62Z" fill="#0d0d0d"/>
+              <path d="M182 28 L226 70 L196 85 L182 62Z" fill="#0d0d0d"/>
+              <text x="120" y="158" text-anchor="middle" font-family="serif" font-size="14" fill="#c9a84c" letter-spacing="1">ESSENTIALS</text>
+              <text x="120" y="176" text-anchor="middle" font-family="serif" font-size="10" fill="#c9a84c" letter-spacing="2" opacity="0.7">OF GOD</text>
+            </svg>
+          </div>
+          <div class="product-badge badge-new">New</div>
+          <div class="product-overlay">
+            <div class="product-brand">Essentials of God</div>
+            <div class="product-name">The Scripture Tee — Black</div>
+            <div class="product-price">$89.00</div>
+            <button class="product-add" onclick="addToCart(this)">Add to Bag</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="shirt-placeholder" style="background:#1a1008;">
+            <svg viewBox="0 0 240 300" width="180" xmlns="http://www.w3.org/2000/svg">
+              <path d="M58 28 L14 70 L44 85 L44 270 L196 270 L196 85 L226 70 L182 28 Q158 10 120 10 Q82 10 58 28Z" fill="#1a1008"/>
+              <text x="120" y="165" text-anchor="middle" font-family="serif" font-size="28" fill="#c9a84c" font-style="italic">Good</text>
+              <text x="120" y="198" text-anchor="middle" font-family="serif" font-size="8" fill="#888" letter-spacing="3">ESSENTIALS OF GOD</text>
+            </svg>
+          </div>
+          <div class="product-overlay">
+            <div class="product-brand">Essentials of God</div>
+            <div class="product-name">"God Is Good" Serif Tee</div>
+            <div class="product-price">$79.00</div>
+            <button class="product-add" onclick="addToCart(this)">Add to Bag</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="shirt-placeholder" style="background:#0a0a14;">
+            <svg viewBox="0 0 240 300" width="180" xmlns="http://www.w3.org/2000/svg">
+              <path d="M58 28 L14 70 L44 85 L44 270 L196 270 L196 85 L226 70 L182 28 Q158 10 120 10 Q82 10 58 28Z" fill="#0a0a14"/>
+              <circle cx="120" cy="160" r="35" fill="none" stroke="#c9a84c" stroke-width="0.8" opacity="0.5"/>
+              <text x="120" y="155" text-anchor="middle" font-family="serif" font-size="12" fill="#c9a84c" letter-spacing="1">FAITH</text>
+              <text x="120" y="172" text-anchor="middle" font-family="serif" font-size="8" fill="#c9a84c" letter-spacing="3" opacity="0.6">OVER FEAR</text>
+            </svg>
+          </div>
+          <div class="product-overlay">
+            <div class="product-brand">Essentials of God</div>
+            <div class="product-name">Faith Over Fear Night Tee</div>
+            <div class="product-price">$95.00</div>
+            <button class="product-add" onclick="addToCart(this)">Add to Bag</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLEIN PANEL -->
+    <div class="product-panel" id="panel-plein">
+      <div class="products-grid">
+        <div class="product-card">
+          <div class="shirt-placeholder" style="background:#0c0c14;">
+            <svg viewBox="0 0 240 300" width="180" xmlns="http://www.w3.org/2000/svg">
+              <path d="M58 28 L14 70 L44 85 L44 270 L196 270 L196 85 L226 70 L182 28 Q158 10 120 10 Q82 10 58 28Z" fill="#0d0d1a"/>
+              <text x="120" y="148" text-anchor="middle" font-family="sans-serif" font-size="22" font-weight="700" fill="white" letter-spacing="-1">PP</text>
+              <text x="120" y="164" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#aaa" letter-spacing="4">PHILIPP PLEIN</text>
+            </svg>
+          </div>
+          <div class="product-badge badge-exclusive">Exclusive</div>
+          <div class="product-overlay">
+            <div class="product-brand">Philipp Plein</div>
+            <div class="product-name">Crystal Skull Statement Tee</div>
+            <div class="product-price">$320.00</div>
+            <button class="product-add" onclick="addToCart(this)">Add to Bag</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="shirt-placeholder" style="background:#111;">
+            <svg viewBox="0 0 240 300" width="180" xmlns="http://www.w3.org/2000/svg">
+              <path d="M58 28 L14 70 L44 85 L44 270 L196 270 L196 85 L226 70 L182 28 Q158 10 120 10 Q82 10 58 28Z" fill="#111"/>
+              <ellipse cx="120" cy="148" rx="26" ry="24" fill="#222" stroke="#c9a84c" stroke-width="0.6"/>
+              <ellipse cx="113" cy="146" rx="6" ry="7" fill="#111"/>
+              <ellipse cx="127" cy="146" rx="6" ry="7" fill="#111"/>
+              <text x="120" y="195" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#c9a84c" letter-spacing="4">PHILIPP PLEIN</text>
+            </svg>
+          </div>
+          <div class="product-overlay">
+            <div class="product-brand">Philipp Plein</div>
+            <div class="product-name">Gold Skull Couture Tee</div>
+            <div class="product-price">$285.00</div>
+            <button class="product-add" onclick="addToCart(this)">Add to Bag</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POLO PANEL -->
+    <div class="product-panel" id="panel-polo">
+      <div class="products-grid">
+        <div class="product-card">
+          <div class="shirt-placeholder" style="background:#0a1020;">
+            <svg viewBox="0 0 240 300" width="180" xmlns="http://www.w3.org/2000/svg">
+              <path d="M58 28 L14 70 L44 85 L44 270 L196 270 L196 85 L226 70 L182 28 Q158 10 120 10 Q82 10 58 28Z" fill="#0d1428"/>
+              <text x="120" y="134" text-anchor="middle" font-family="serif" font-size="7" fill="#4a6fa5" letter-spacing="3">RALPH LAUREN</text>
+              <text x="120" y="220" text-anchor="middle" font-size="8" fill="#4a6fa5" font-family="serif" letter-spacing="2">SPORT</text>
+            </svg>
+          </div>
+          <div class="product-overlay">
+            <div class="product-brand">Polo Ralph Lauren</div>
+            <div class="product-name">Classic Sport Polo Tee</div>
+            <div class="product-price">$125.00</div>
+            <button class="product-add" onclick="addToCart(this)">Add to Bag</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="shirt-placeholder">
+            <svg viewBox="0 0 240 300" width="180" xmlns="http://www.w3.org/2000/svg">
+              <path d="M58 28 L14 70 L44 85 L44 270 L196 270 L196 85 L226 70 L182 28 Q158 10 120 10 Q82 10 58 28Z" fill="#0e0e0e"/>
+              <path d="M92 26 Q120 52 148 26" stroke="#c9a84c" stroke-width="1.5" fill="#1a1a1a"/>
+              <text x="120" y="158" text-anchor="middle" font-family="serif" font-size="12" fill="#f5f2ed" letter-spacing="4">POLO</text>
+              <text x="120" y="198" text-anchor="middle" font-family="serif" font-size="7" fill="#c9a84c" letter-spacing="4">CUSTOM FIT</text>
+            </svg>
+          </div>
+          <div class="product-badge badge-new">New</div>
+          <div class="product-overlay">
+            <div class="product-brand">Polo Ralph Lauren</div>
+            <div class="product-name">Custom Fit Piqué Polo White</div>
+            <div class="product-price">$140.00</div>
+            <button class="product-add" onclick="addToCart(this)">Add to Bag</button>
+          </div>
+        </div>
+        <div class="product-card">
+          <div class="shirt-placeholder" style="background:#0a1a10;">
+            <svg viewBox="0 0 240 300" width="180" xmlns="http://www.w3.org/2000/svg">
+              <path d="M58 28 L14 70 L44 85 L44 270 L196 270 L196 85 L226 70 L182 28 Q158 10 120 10 Q82 10 58 28Z" fill="#0a1a10"/>
+              <text x="120" y="158" text-anchor="middle" font-family="serif" font-size="12" fill="#4a8a5a" letter-spacing="3">POLO</text>
+              <text x="120" y="175" text-anchor="middle" font-family="serif" font-size="7" fill="#4a8a5a" letter-spacing="3" opacity="0.7">RALPH LAUREN</text>
+              <rect x="106" y="183" width="28" height="1" fill="#4a8a5a" opacity="0.7"/>
+              <text x="120" y="198" text-anchor="middle" font-family="serif" font-size="7" fill="#4a8a5a" letter-spacing="3">HERITAGE</text>
+            </svg>
+          </div>
+          <div class="product-overlay">
+            <div class="product-brand">Polo Ralph Lauren</div>
+            <div class="product-name">Heritage Edition — Forest</div>
+            <div class="product-price">$155.00</div>
+            <button class="product-add" onclick="addToCart(this)">Add to Bag</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BRAND STORIES -->
+  <div class="brand-story" id="brands">
+    <div class="section-label">The Labels</div>
+    <h2 class="section-title" style="margin-bottom:40px;">THE BRANDS</h2>
+    <div class="brand-story-grid">
+      <div class="story-card">
+        <div class="story-num">01</div>
+        <div class="story-brand-name">Essentials <span>of God</span></div>
+        <p class="story-text">Born from faith and streetwear culture, Essentials of God merges spiritual affirmations with bold minimalist design. Every piece carries a message — a reminder that strength comes from above.</p>
+        <a href="#" class="story-link">Explore brand</a>
+      </div>
+      <div class="story-card">
+        <div class="story-num">02</div>
+        <div class="story-brand-name">Philipp <span>Plein</span></div>
+        <p class="story-text">The enfant terrible of luxury fashion. Philipp Plein's T-shirts are unmistakable — skull motifs, crystal embellishments, and razor-sharp tailoring make every piece a statement of pure audacity.</p>
+        <a href="#" class="story-link">Explore brand</a>
+      </div>
+      <div class="story-card">
+        <div class="story-num">03</div>
+        <div class="story-brand-name">Polo Ralph <span>Lauren</span></div>
+        <p class="story-text">An American institution. Since 1967, Polo Ralph Lauren has defined preppy elegance and relaxed luxury. Their T-shirts and polos are timeless wardrobe essentials worn by generations.</p>
+        <a href="#" class="story-link">Explore brand</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWSLETTER -->
+  <div class="newsletter" id="contact">
+    <div class="newsletter-content">
+      <div class="section-label" style="justify-content:center; margin-bottom:20px;">Stay in the loop</div>
+      <h2>Drop Into Our World</h2>
+      <p>New drops, exclusive access, and style guides — straight to your inbox.</p>
+      <div class="newsletter-form">
+        <input class="newsletter-input" type="email" placeholder="your@email.com" id="emailInput">
+        <button class="newsletter-submit" onclick="handleSubscribe()">Subscribe</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer id="about">
+    <div class="footer-top">
+      <div>
+        <a href="#" class="footer-logo">THRE<span>A</span>DS</a>
+        <p class="footer-desc">Curating the finest T-shirts from the world's most iconic labels. Built to W3C standards. Designed for distinction.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <ul class="footer-links">
+          <li><a href="#">All Products</a></li>
+          <li><a href="#">Essentials of God</a></li>
+          <li><a href="#">Philipp Plein</a></li>
+          <li><a href="#">Polo Ralph Lauren</a></li>
+          <li><a href="#">New Arrivals</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Help</h4>
+        <ul class="footer-links">
+          <li><a href="#">Sizing Guide</a></li>
+          <li><a href="#">Shipping Info</a></li>
+          <li><a href="#">Returns</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul class="footer-links">
+          <li><a href="#">About Us</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Press</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 THREADS. ALL RIGHTS RESERVED.</div>
+      <div class="footer-socials">
+        <a href="#">Instagram</a>
+        <a href="#">TikTok</a>
+        <a href="#">Twitter</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx + 'px';
+      cursor.style.top = my + 'px';
+    });
+
+    function animateRing() {
+      rx += (mx - rx) * 0.12;
+      ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px';
+      ring.style.top = ry + 'px';
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => { cursor.style.transform = 'translate(-50%,-50%) scale(2.5)'; ring.style.opacity = '0'; });
+      el.addEventListener('mouseleave', () => { cursor.style.transform = 'translate(-50%,-50%) scale(1)'; ring.style.opacity = '0.6'; });
+    });
+
+    // Brand tabs
+    function switchTab(btn) {
+      document.querySelectorAll('.brand-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.product-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+    }
+
+    // Cart
+    let cartCount = 0;
+    function addToCart(btn) {
+      cartCount++;
+      document.querySelector('.cart-btn').textContent = `Bag (${cartCount})`;
+      showToast('Added to bag ✓');
+    }
+
+    // Toast
+    const toast = document.getElementById('toast');
+    let toastTimer;
+    function showToast(msg) {
+      toast.textContent = msg;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 2500);
+    }
+
+    // Newsletter
+    function handleSubscribe() {
+      const v = document.getElementById('emailInput').value;
+      if (v && v.includes('@')) {
+        showToast('You\'re on the list ✓');
+        document.getElementById('emailInput').value = '';
+      } else {
+        showToast('Please enter a valid email');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,26 +1,772 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My First GitHub Page</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>THREADS — Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --black: #0a0a0a;
+      --white: #f5f2ed;
+      --gold: #c9a84c;
+      --gold-light: #e8d49a;
+      --grey: #6b6b6b;
+      --grey-light: #d4cfc8;
+      --red: #b83232;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Cormorant Garamond', serif;
+      cursor: none;
+      overflow-x: hidden;
+    }
+    .cursor {
+      position: fixed; width: 10px; height: 10px;
+      background: var(--gold); border-radius: 50%;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.15s ease;
+    }
+    .cursor-ring {
+      position: fixed; width: 36px; height: 36px;
+      border: 1px solid var(--gold); border-radius: 50%;
+      pointer-events: none; z-index: 9998; opacity: 0.6;
+      transform: translate(-50%, -50%);
+    }
+    ::-webkit-scrollbar { width: 3px; }
+    ::-webkit-scrollbar-track { background: var(--black); }
+    ::-webkit-scrollbar-thumb { background: var(--gold); }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 24px 48px;
+      background: linear-gradient(to bottom, rgba(10,10,10,0.97), transparent);
+    }
+    .nav-logo {
+      font-family: 'Bebas Neue', sans-serif; font-size: 2rem;
+      letter-spacing: 0.25em; color: var(--white); text-decoration: none;
+    }
+    .nav-logo span { color: var(--gold); }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      font-family: 'Space Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      color: var(--grey-light); text-decoration: none; transition: color 0.3s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--gold); }
+    .nav-cart {
+      font-family: 'Space Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.15em; text-transform: uppercase;
+      background: none; border: 1px solid var(--gold);
+      color: var(--gold); padding: 8px 20px; cursor: none;
+      transition: background 0.3s, color 0.3s; text-decoration: none; display: inline-block;
+    }
+    .nav-cart:hover { background: var(--gold); color: var(--black); }
+
+    /* SPLASH HERO */
+    .splash {
+      height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      position: relative; overflow: hidden; text-align: center;
+    }
+    .splash-bg {
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 50% 60%, rgba(201,168,76,0.07) 0%, transparent 70%);
+    }
+    .splash-word {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(6rem, 18vw, 18rem);
+      letter-spacing: 0.06em; line-height: 0.88;
+      color: transparent;
+      -webkit-text-stroke: 1px rgba(201,168,76,0.25);
+      position: absolute;
+      pointer-events: none;
+      user-select: none;
+    }
+    .splash-content { position: relative; z-index: 2; }
+    .splash-eyebrow {
+      font-family: 'Space Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.35em; text-transform: uppercase; color: var(--gold);
+      margin-bottom: 24px;
+      opacity: 0; animation: fadeUp 0.8s ease 0.3s forwards;
+    }
+    .splash-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(3.5rem, 10vw, 9rem);
+      line-height: 0.9; letter-spacing: 0.04em;
+      opacity: 0; animation: fadeUp 0.9s ease 0.5s forwards;
+    }
+    .splash-title em {
+      display: block; font-family: 'Cormorant Garamond', serif;
+      font-style: italic; font-weight: 300; color: var(--gold);
+      font-size: 0.55em; letter-spacing: 0.08em;
+    }
+    .splash-sub {
+      font-size: 1.1rem; font-weight: 300; color: var(--grey-light);
+      max-width: 480px; margin: 28px auto 44px; line-height: 1.7;
+      opacity: 0; animation: fadeUp 0.9s ease 0.7s forwards;
+    }
+    .splash-cta {
+      display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+      opacity: 0; animation: fadeUp 0.9s ease 0.9s forwards;
+    }
+    .btn-gold {
+      font-family: 'Space Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      background: var(--gold); color: var(--black); border: none;
+      padding: 16px 40px; cursor: none; font-weight: 700;
+      text-decoration: none; display: inline-block;
+      transition: opacity 0.3s, transform 0.3s;
+    }
+    .btn-gold:hover { opacity: 0.85; transform: translateY(-2px); }
+    .btn-ghost {
+      font-family: 'Space Mono', monospace; font-size: 0.7rem;
+      letter-spacing: 0.18em; text-transform: uppercase;
+      background: transparent; color: var(--white);
+      border: 1px solid rgba(245,242,237,0.3);
+      padding: 16px 40px; cursor: none;
+      text-decoration: none; display: inline-block;
+      transition: border-color 0.3s, color 0.3s;
+    }
+    .btn-ghost:hover { border-color: var(--white); }
+
+    .scroll-hint {
+      position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
+      font-family: 'Space Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.25em; text-transform: uppercase; color: var(--grey);
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
+      opacity: 0; animation: fadeUp 1s ease 1.3s forwards;
+    }
+    .scroll-line {
+      width: 1px; height: 40px; background: var(--gold);
+      animation: scrollPulse 2s ease-in-out infinite;
+    }
+    @keyframes scrollPulse {
+      0%, 100% { opacity: 0.3; transform: scaleY(1); }
+      50% { opacity: 1; transform: scaleY(1.2); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* MARQUEE */
+    .marquee-strip {
+      background: var(--gold); padding: 14px 0; overflow: hidden; white-space: nowrap;
+    }
+    .marquee-inner { display: inline-flex; animation: marqueeScroll 20s linear infinite; }
+    .marquee-item {
+      font-family: 'Bebas Neue', sans-serif; font-size: 1rem;
+      letter-spacing: 0.25em; color: var(--black); padding: 0 36px;
+    }
+    @keyframes marqueeScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* INTRO SPLIT */
+    .intro {
+      display: grid; grid-template-columns: 1fr 1fr;
+      min-height: 80vh;
+    }
+    .intro-left {
+      background: #0e0e0e;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 80px 60px;
+      border-right: 1px solid #1a1a1a;
+    }
+    .intro-label {
+      font-family: 'Space Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold);
+      margin-bottom: 20px; display: flex; align-items: center; gap: 12px;
+    }
+    .intro-label::before { content: ''; width: 28px; height: 1px; background: var(--gold); display: block; }
+    .intro-heading {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: 0.04em; line-height: 1;
+      margin-bottom: 24px;
+    }
+    .intro-body {
+      font-size: 1rem; font-weight: 300; color: var(--grey-light);
+      line-height: 1.85; max-width: 380px; margin-bottom: 36px;
+    }
+    .intro-stats {
+      display: flex; gap: 48px; margin-bottom: 40px;
+    }
+    .stat-num {
+      font-family: 'Bebas Neue', sans-serif; font-size: 3rem;
+      color: var(--gold); line-height: 1; letter-spacing: 0.02em;
+    }
+    .stat-label {
+      font-family: 'Space Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey);
+      margin-top: 4px;
+    }
+    .intro-right {
+      display: grid; grid-template-rows: 1fr 1fr;
+    }
+    .intro-img-block {
+      background: #111;
+      display: flex; align-items: center; justify-content: center;
+      border-bottom: 1px solid #1a1a1a; overflow: hidden;
+      position: relative;
+    }
+    .intro-img-block:hover svg { transform: scale(1.04); }
+    .intro-img-block svg { transition: transform 0.7s ease; }
+    .block-label {
+      position: absolute; bottom: 20px; left: 24px;
+      font-family: 'Space Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey);
+    }
+
+    /* BRAND SHOWCASE */
+    .brands-showcase {
+      padding: 100px 48px;
+      background: #080808;
+    }
+    .section-label {
+      font-family: 'Space Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold);
+      margin-bottom: 16px; display: flex; align-items: center; gap: 16px;
+    }
+    .section-label::before { content: ''; width: 30px; height: 1px; background: var(--gold); display: block; }
+    .section-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(2.5rem, 5vw, 4.5rem); line-height: 1;
+      letter-spacing: 0.03em; margin-bottom: 60px;
+    }
+    .brands-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+    .brand-tile {
+      position: relative; overflow: hidden;
+      min-height: 400px;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 40px 36px;
+      background: #111;
+      cursor: none;
+      transition: background 0.4s;
+    }
+    .brand-tile:hover { background: #161616; }
+    .brand-tile-num {
+      position: absolute; top: 28px; right: 28px;
+      font-family: 'Bebas Neue', sans-serif; font-size: 5rem;
+      color: rgba(255,255,255,0.04); line-height: 1;
+    }
+    .brand-tile-icon {
+      margin-bottom: 24px;
+      display: flex; align-items: center; justify-content: center;
+      height: 180px;
+    }
+    .brand-tile-name {
+      font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem;
+      letter-spacing: 0.08em; margin-bottom: 10px;
+    }
+    .brand-tile-tagline {
+      font-size: 0.9rem; font-weight: 300; color: var(--grey-light);
+      line-height: 1.6; margin-bottom: 24px;
+    }
+    .brand-tile-link {
+      font-family: 'Space Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold);
+      text-decoration: none; display: flex; align-items: center; gap: 10px;
+      transition: gap 0.3s;
+    }
+    .brand-tile-link:hover { gap: 18px; }
+    .brand-tile-link::after { content: '→'; }
+    .brand-tile-bar {
+      position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+      background: var(--gold); transform: scaleX(0); transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+    .brand-tile:hover .brand-tile-bar { transform: scaleX(1); }
+
+    /* LOOKBOOK STRIP */
+    .lookbook { padding: 80px 0; overflow: hidden; }
+    .lookbook-header {
+      padding: 0 48px; margin-bottom: 48px;
+      display: flex; align-items: flex-end; justify-content: space-between;
+    }
+    .lookbook-track {
+      display: flex; gap: 2px;
+      animation: lookbookScroll 30s linear infinite;
+      width: max-content;
+    }
+    .lookbook-track:hover { animation-play-state: paused; }
+    @keyframes lookbookScroll {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+    .look-card {
+      width: 260px; flex-shrink: 0; background: #111;
+      position: relative; overflow: hidden;
+    }
+    .look-visual {
+      height: 360px;
+      display: flex; align-items: center; justify-content: center;
+      background: #0e0e0e;
+    }
+    .look-caption {
+      padding: 20px 20px;
+      font-size: 0.9rem; font-weight: 300; color: var(--grey-light);
+    }
+    .look-caption strong {
+      font-family: 'Space Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.15em; text-transform: uppercase; color: var(--white);
+      display: block; margin-bottom: 4px;
+    }
+
+    /* FEATURES */
+    .features {
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      border-top: 1px solid #1a1a1a; border-bottom: 1px solid #1a1a1a;
+    }
+    .feat {
+      padding: 44px 36px; border-right: 1px solid #1a1a1a;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .feat:last-child { border-right: none; }
+    .feat-icon { font-size: 1.4rem; }
+    .feat-title {
+      font-family: 'Space Mono', monospace; font-size: 0.68rem;
+      letter-spacing: 0.15em; text-transform: uppercase; color: var(--white);
+    }
+    .feat-desc { font-size: 0.88rem; font-weight: 300; color: var(--grey); line-height: 1.6; }
+
+    /* TESTIMONIAL PREVIEW */
+    .testimonial-preview {
+      padding: 100px 48px;
+      background: #0e0e0e;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+    }
+    .tp-label {
+      font-family: 'Space Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.3em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px;
+    }
+    .tp-quote {
+      font-family: 'Cormorant Garamond', serif; font-size: clamp(1.3rem, 2.5vw, 1.8rem);
+      font-weight: 300; font-style: italic; line-height: 1.6; color: var(--white);
+      margin-bottom: 28px;
+    }
+    .tp-quote::before { content: '"'; color: var(--gold); font-size: 3em; line-height: 0; vertical-align: -0.4em; margin-right: 4px; }
+    .tp-author {
+      font-family: 'Space Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.2em; text-transform: uppercase; color: var(--grey-light);
+    }
+    .tp-stars { color: var(--gold); font-size: 0.9rem; margin-bottom: 16px; letter-spacing: 4px; }
+    .tp-right { display: flex; flex-direction: column; gap: 20px; }
+    .mini-review {
+      background: #141414; padding: 28px; border-left: 2px solid #222;
+      transition: border-color 0.3s;
+    }
+    .mini-review:hover { border-left-color: var(--gold); }
+    .mini-stars { font-size: 0.75rem; color: var(--gold); margin-bottom: 10px; }
+    .mini-text { font-size: 0.9rem; font-weight: 300; color: var(--grey-light); line-height: 1.6; }
+    .mini-author {
+      font-family: 'Space Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.15em; text-transform: uppercase; color: var(--grey);
+      margin-top: 12px;
+    }
+    .tp-cta-wrap { margin-top: 24px; }
+
+    /* FOOTER */
+    footer { background: #060606; padding: 60px 48px 32px; }
+    .footer-top {
+      display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px;
+      padding-bottom: 48px; border-bottom: 1px solid #1a1a1a;
+    }
+    .footer-logo {
+      font-family: 'Bebas Neue', sans-serif; font-size: 2rem;
+      letter-spacing: 0.25em; text-decoration: none; color: var(--white); display: block; margin-bottom: 16px;
+    }
+    .footer-logo span { color: var(--gold); }
+    .footer-desc { font-size: 0.9rem; font-weight: 300; color: var(--grey); line-height: 1.7; max-width: 240px; }
+    .footer-col h4 {
+      font-family: 'Space Mono', monospace; font-size: 0.65rem;
+      letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px;
+    }
+    .footer-links { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-links a { font-size: 0.9rem; font-weight: 300; color: var(--grey); text-decoration: none; transition: color 0.3s; }
+    .footer-links a:hover { color: var(--white); }
+    .footer-bottom {
+      display: flex; justify-content: space-between; align-items: center; padding-top: 28px;
+    }
+    .footer-copy { font-family: 'Space Mono', monospace; font-size: 0.6rem; letter-spacing: 0.1em; color: var(--grey); }
+    .footer-socials { display: flex; gap: 16px; }
+    .footer-socials a {
+      font-family: 'Space Mono', monospace; font-size: 0.6rem;
+      letter-spacing: 0.15em; text-transform: uppercase; color: var(--grey);
+      text-decoration: none; transition: color 0.3s;
+    }
+    .footer-socials a:hover { color: var(--gold); }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      nav { padding: 20px 24px; }
+      .nav-links { display: none; }
+      .intro { grid-template-columns: 1fr; }
+      .intro-right { display: none; }
+      .intro-left { padding: 80px 24px; }
+      .brands-grid { grid-template-columns: 1fr; }
+      .features { grid-template-columns: 1fr 1fr; }
+      .testimonial-preview { grid-template-columns: 1fr; gap: 40px; padding: 64px 24px; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+      .brands-showcase, .lookbook { padding: 64px 24px; }
+      .lookbook-header { padding: 0 24px; }
+    }
+    @media (max-width: 540px) {
+      .features { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr; }
+      .splash-cta { flex-direction: column; align-items: center; }
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <h1>Welcome to My Website!</h1>
-    </header>
 
-    <main>
-        <p>This is a simple webpage hosted on GitHub Pages.</p>
-        <p>Here's a picture of a cute cat:</p>
-        <img src="https://placekitten.com/200/300" alt="A cute kitten">
-        
-        <p>Visit <a href="https://github.com">GitHub</a> to learn more about coding.</p>
-    </main>
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
 
-    <footer>
-        <p>&copy; 2025 Your Name</p>
-    </footer>
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">THRE<span>A</span>DS</a>
+    <ul class="nav-links">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="threads.html">Collection</a></li>
+      <li><a href="threads.html#brands">Brands</a></li>
+      <li><a href="feedback.html">Reviews</a></li>
+    </ul>
+    <a href="threads.html" class="nav-cart">Shop Now</a>
+  </nav>
 
+  <!-- SPLASH HERO -->
+  <section class="splash">
+    <div class="splash-bg"></div>
+    <div class="splash-word">THREADS</div>
+    <div class="splash-content">
+      <div class="splash-eyebrow">Premium T-Shirt Destination</div>
+      <h1 class="splash-title">
+        Dress With<br>
+        <em>Intention</em>
+      </h1>
+      <p class="splash-sub">Three legendary brands. One curated space. Essentials of God, Philipp Plein, and Polo Ralph Lauren — handpicked for those who understand that clothing is a language.</p>
+      <div class="splash-cta">
+        <a href="threads.html" class="btn-gold">Explore Collection</a>
+        <a href="feedback.html" class="btn-ghost">Read Reviews</a>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      Scroll
+      <div class="scroll-line"></div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-strip">
+    <div class="marquee-inner">
+      <span class="marquee-item">Essentials of God</span><span class="marquee-item">✦</span>
+      <span class="marquee-item">Philipp Plein</span><span class="marquee-item">✦</span>
+      <span class="marquee-item">Polo Ralph Lauren</span><span class="marquee-item">✦</span>
+      <span class="marquee-item">Premium Tees Only</span><span class="marquee-item">✦</span>
+      <span class="marquee-item">Free Shipping $150+</span><span class="marquee-item">✦</span>
+      <span class="marquee-item">Essentials of God</span><span class="marquee-item">✦</span>
+      <span class="marquee-item">Philipp Plein</span><span class="marquee-item">✦</span>
+      <span class="marquee-item">Polo Ralph Lauren</span><span class="marquee-item">✦</span>
+      <span class="marquee-item">Premium Tees Only</span><span class="marquee-item">✦</span>
+      <span class="marquee-item">Free Shipping $150+</span><span class="marquee-item">✦</span>
+    </div>
+  </div>
+
+  <!-- INTRO SPLIT -->
+  <div class="intro">
+    <div class="intro-left">
+      <div class="intro-label">Our Story</div>
+      <h2 class="intro-heading">Born From A Love Of The Tee</h2>
+      <p class="intro-body">THREADS was built on a single belief: the T-shirt is the most personal garment you own. It carries your message, your faith, your aesthetic. We curate only the best — pieces that speak before you do.</p>
+      <div class="intro-stats">
+        <div>
+          <div class="stat-num">3</div>
+          <div class="stat-label">Iconic Brands</div>
+        </div>
+        <div>
+          <div class="stat-num">50+</div>
+          <div class="stat-label">Unique Pieces</div>
+        </div>
+        <div>
+          <div class="stat-num">2K+</div>
+          <div class="stat-label">Happy Clients</div>
+        </div>
+      </div>
+      <a href="threads.html" class="btn-gold" style="align-self:flex-start;">View Collection</a>
+    </div>
+    <div class="intro-right">
+      <div class="intro-img-block">
+        <svg viewBox="0 0 300 220" width="260" xmlns="http://www.w3.org/2000/svg">
+          <rect width="300" height="220" fill="#0e0e0e"/>
+          <path d="M60 28 L16 68 L44 82 L44 200 L256 200 L256 82 L284 68 L240 28 Q195 8 150 8 Q105 8 60 28Z" fill="#141414" stroke="#1e1e1e" stroke-width="1.2"/>
+          <text x="150" y="118" text-anchor="middle" font-family="serif" font-size="13" fill="#c9a84c" letter-spacing="2">ESSENTIALS</text>
+          <text x="150" y="136" text-anchor="middle" font-family="serif" font-size="9" fill="#c9a84c" opacity="0.7" letter-spacing="3">OF GOD</text>
+          <line x1="100" y1="144" x2="200" y2="144" stroke="#c9a84c" stroke-width="0.5" opacity="0.4"/>
+        </svg>
+        <div class="block-label">Essentials of God</div>
+      </div>
+      <div class="intro-img-block" style="border-top:1px solid #1a1a1a;">
+        <svg viewBox="0 0 300 220" width="260" xmlns="http://www.w3.org/2000/svg">
+          <rect width="300" height="220" fill="#0c0c14"/>
+          <path d="M60 28 L16 68 L44 82 L44 200 L256 200 L256 82 L284 68 L240 28 Q195 8 150 8 Q105 8 60 28Z" fill="#0e0e1a" stroke="#1a1a2a" stroke-width="1.2"/>
+          <text x="150" y="114" text-anchor="middle" font-family="sans-serif" font-size="28" font-weight="700" fill="white" letter-spacing="-1">PP</text>
+          <text x="150" y="132" text-anchor="middle" font-family="sans-serif" font-size="7" fill="#aaa" letter-spacing="5">PHILIPP PLEIN</text>
+          <circle cx="150" cy="120" r="3" fill="#ff2244"/>
+          <line x1="44" y1="193" x2="256" y2="193" stroke="#ff2244" stroke-width="1.5"/>
+        </svg>
+        <div class="block-label">Philipp Plein</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BRAND SHOWCASE -->
+  <section class="brands-showcase">
+    <div class="section-label">The Labels</div>
+    <h2 class="section-title">OUR THREE BRANDS</h2>
+    <div class="brands-grid">
+
+      <div class="brand-tile">
+        <div class="brand-tile-num">01</div>
+        <div class="brand-tile-icon">
+          <svg viewBox="0 0 200 160" width="180" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="100" cy="80" r="55" fill="none" stroke="#c9a84c" stroke-width="0.7" opacity="0.3"/>
+            <circle cx="100" cy="80" r="40" fill="none" stroke="#c9a84c" stroke-width="0.4" opacity="0.2"/>
+            <text x="100" y="75" text-anchor="middle" font-family="serif" font-size="16" fill="#c9a84c" letter-spacing="1">ESSENTIALS</text>
+            <text x="100" y="94" text-anchor="middle" font-family="serif" font-size="11" fill="#c9a84c" opacity="0.7" letter-spacing="2">OF GOD</text>
+          </svg>
+        </div>
+        <div class="brand-tile-name">Essentials of God</div>
+        <div class="brand-tile-tagline">Faith-forward streetwear that carries meaning in every stitch. Minimalist design. Maximum message.</div>
+        <a href="threads.html" class="brand-tile-link">Shop the brand</a>
+        <div class="brand-tile-bar"></div>
+      </div>
+
+      <div class="brand-tile" style="background:#0c0c14;">
+        <div class="brand-tile-num">02</div>
+        <div class="brand-tile-icon">
+          <svg viewBox="0 0 200 160" width="180" xmlns="http://www.w3.org/2000/svg">
+            <text x="100" y="90" text-anchor="middle" font-family="sans-serif" font-size="52" font-weight="700" fill="white" letter-spacing="-2" opacity="0.9">PP</text>
+            <text x="100" y="110" text-anchor="middle" font-family="sans-serif" font-size="8" fill="#aaa" letter-spacing="6">PHILIPP PLEIN</text>
+            <circle cx="100" cy="80" r="4" fill="#ff2244"/>
+          </svg>
+        </div>
+        <div class="brand-tile-name">Philipp Plein</div>
+        <div class="brand-tile-tagline">Unapologetic luxury. Skull motifs, crystal embellishments and razor-sharp tailoring for those who dare.</div>
+        <a href="threads.html" class="brand-tile-link">Shop the brand</a>
+        <div class="brand-tile-bar"></div>
+      </div>
+
+      <div class="brand-tile" style="background:#0a1020;">
+        <div class="brand-tile-num">03</div>
+        <div class="brand-tile-icon">
+          <svg viewBox="0 0 200 160" width="180" xmlns="http://www.w3.org/2000/svg">
+            <text x="100" y="72" text-anchor="middle" font-family="serif" font-size="14" fill="#4a6fa5" letter-spacing="5">POLO</text>
+            <text x="100" y="90" text-anchor="middle" font-family="serif" font-size="9" fill="#4a6fa5" letter-spacing="3" opacity="0.7">RALPH LAUREN</text>
+            <line x1="60" y1="98" x2="140" y2="98" stroke="#4a6fa5" stroke-width="0.7" opacity="0.5"/>
+            <text x="100" y="115" text-anchor="middle" font-size="28" fill="#4a6fa5">🏇</text>
+          </svg>
+        </div>
+        <div class="brand-tile-name">Polo Ralph Lauren</div>
+        <div class="brand-tile-tagline">An American institution since 1967. Timeless polo shirts and tees worn by generations, built to last a lifetime.</div>
+        <a href="threads.html" class="brand-tile-link">Shop the brand</a>
+        <div class="brand-tile-bar"></div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- LOOKBOOK AUTO-SCROLL -->
+  <div class="lookbook">
+    <div class="lookbook-header">
+      <div>
+        <div class="section-label">Lookbook</div>
+        <h2 class="section-title" style="margin-bottom:0;">HOW TO WEAR IT</h2>
+      </div>
+      <a href="threads.html" class="btn-ghost" style="align-self:flex-end;">View All</a>
+    </div>
+    <div style="overflow:hidden;">
+      <div class="lookbook-track">
+        <!-- Cards × 2 for infinite loop -->
+        <div class="look-card"><div class="look-visual" style="background:#111;">
+          <svg viewBox="0 0 160 200" width="120" xmlns="http://www.w3.org/2000/svg">
+            <path d="M34 18 L8 44 L26 53 L26 180 L134 180 L134 53 L152 44 L126 18 Q100 5 80 5 Q60 5 34 18Z" fill="#0e0e0e" stroke="#1e1e1e" stroke-width="1"/>
+            <text x="80" y="100" text-anchor="middle" font-family="serif" font-size="9" fill="#c9a84c" letter-spacing="1">ESSENTIALS</text>
+          </svg>
+        </div><div class="look-caption"><strong>The Scripture</strong>Black / Relaxed Fit</div></div>
+
+        <div class="look-card"><div class="look-visual" style="background:#0c0c14;">
+          <svg viewBox="0 0 160 200" width="120" xmlns="http://www.w3.org/2000/svg">
+            <path d="M34 18 L8 44 L26 53 L26 180 L134 180 L134 53 L152 44 L126 18 Q100 5 80 5 Q60 5 34 18Z" fill="#0d0d1a" stroke="#1a1a2a" stroke-width="1"/>
+            <text x="80" y="100" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="700" fill="white">PP</text>
+          </svg>
+        </div><div class="look-caption"><strong>Philipp Plein</strong>Crystal Skull / Navy</div></div>
+
+        <div class="look-card"><div class="look-visual" style="background:#0a1020;">
+          <svg viewBox="0 0 160 200" width="120" xmlns="http://www.w3.org/2000/svg">
+            <path d="M34 18 L8 44 L26 53 L26 180 L134 180 L134 53 L152 44 L126 18 Q100 5 80 5 Q60 5 34 18Z" fill="#0d1428" stroke="#1a2038" stroke-width="1"/>
+            <text x="80" y="100" text-anchor="middle" font-family="serif" font-size="9" fill="#4a6fa5" letter-spacing="3">POLO</text>
+          </svg>
+        </div><div class="look-caption"><strong>Polo RL</strong>Sport / Classic Blue</div></div>
+
+        <div class="look-card"><div class="look-visual" style="background:#1a1008;">
+          <svg viewBox="0 0 160 200" width="120" xmlns="http://www.w3.org/2000/svg">
+            <path d="M34 18 L8 44 L26 53 L26 180 L134 180 L134 53 L152 44 L126 18 Q100 5 80 5 Q60 5 34 18Z" fill="#1a1008" stroke="#2a1a08" stroke-width="1"/>
+            <text x="80" y="104" text-anchor="middle" font-family="serif" font-size="18" fill="#c9a84c" font-style="italic">Good</text>
+          </svg>
+        </div><div class="look-caption"><strong>God Is Good</strong>Tobacco / Oversize</div></div>
+
+        <div class="look-card"><div class="look-visual" style="background:#111;">
+          <svg viewBox="0 0 160 200" width="120" xmlns="http://www.w3.org/2000/svg">
+            <path d="M34 18 L8 44 L26 53 L26 180 L134 180 L134 53 L152 44 L126 18 Q100 5 80 5 Q60 5 34 18Z" fill="#111" stroke="#1e1e1e" stroke-width="1"/>
+            <ellipse cx="80" cy="96" rx="20" ry="18" fill="#222" stroke="#c9a84c" stroke-width="0.6"/>
+            <ellipse cx="74" cy="94" rx="5" ry="6" fill="#111"/>
+            <ellipse cx="86" cy="94" rx="5" ry="6" fill="#111"/>
+          </svg>
+        </div><div class="look-caption"><strong>Gold Skull</strong>Plein / All Black</div></div>
+
+        <!-- Duplicate for loop -->
+        <div class="look-card"><div class="look-visual" style="background:#111;">
+          <svg viewBox="0 0 160 200" width="120" xmlns="http://www.w3.org/2000/svg">
+            <path d="M34 18 L8 44 L26 53 L26 180 L134 180 L134 53 L152 44 L126 18 Q100 5 80 5 Q60 5 34 18Z" fill="#0e0e0e" stroke="#1e1e1e" stroke-width="1"/>
+            <text x="80" y="100" text-anchor="middle" font-family="serif" font-size="9" fill="#c9a84c" letter-spacing="1">ESSENTIALS</text>
+          </svg>
+        </div><div class="look-caption"><strong>The Scripture</strong>Black / Relaxed Fit</div></div>
+        <div class="look-card"><div class="look-visual" style="background:#0c0c14;">
+          <svg viewBox="0 0 160 200" width="120" xmlns="http://www.w3.org/2000/svg">
+            <path d="M34 18 L8 44 L26 53 L26 180 L134 180 L134 53 L152 44 L126 18 Q100 5 80 5 Q60 5 34 18Z" fill="#0d0d1a" stroke="#1a1a2a" stroke-width="1"/>
+            <text x="80" y="100" text-anchor="middle" font-family="sans-serif" font-size="18" font-weight="700" fill="white">PP</text>
+          </svg>
+        </div><div class="look-caption"><strong>Philipp Plein</strong>Crystal Skull / Navy</div></div>
+        <div class="look-card"><div class="look-visual" style="background:#0a1020;">
+          <svg viewBox="0 0 160 200" width="120" xmlns="http://www.w3.org/2000/svg">
+            <path d="M34 18 L8 44 L26 53 L26 180 L134 180 L134 53 L152 44 L126 18 Q100 5 80 5 Q60 5 34 18Z" fill="#0d1428" stroke="#1a2038" stroke-width="1"/>
+            <text x="80" y="100" text-anchor="middle" font-family="serif" font-size="9" fill="#4a6fa5" letter-spacing="3">POLO</text>
+          </svg>
+        </div><div class="look-caption"><strong>Polo RL</strong>Sport / Classic Blue</div></div>
+        <div class="look-card"><div class="look-visual" style="background:#1a1008;">
+          <svg viewBox="0 0 160 200" width="120" xmlns="http://www.w3.org/2000/svg">
+            <path d="M34 18 L8 44 L26 53 L26 180 L134 180 L134 53 L152 44 L126 18 Q100 5 80 5 Q60 5 34 18Z" fill="#1a1008" stroke="#2a1a08" stroke-width="1"/>
+            <text x="80" y="104" text-anchor="middle" font-family="serif" font-size="18" fill="#c9a84c" font-style="italic">Good</text>
+          </svg>
+        </div><div class="look-caption"><strong>God Is Good</strong>Tobacco / Oversize</div></div>
+        <div class="look-card"><div class="look-visual" style="background:#111;">
+          <svg viewBox="0 0 160 200" width="120" xmlns="http://www.w3.org/2000/svg">
+            <path d="M34 18 L8 44 L26 53 L26 180 L134 180 L134 53 L152 44 L126 18 Q100 5 80 5 Q60 5 34 18Z" fill="#111" stroke="#1e1e1e" stroke-width="1"/>
+            <ellipse cx="80" cy="96" rx="20" ry="18" fill="#222" stroke="#c9a84c" stroke-width="0.6"/>
+            <ellipse cx="74" cy="94" rx="5" ry="6" fill="#111"/>
+            <ellipse cx="86" cy="94" rx="5" ry="6" fill="#111"/>
+          </svg>
+        </div><div class="look-caption"><strong>Gold Skull</strong>Plein / All Black</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="features">
+    <div class="feat"><div class="feat-icon">✦</div><div class="feat-title">W3C Standards</div><div class="feat-desc">Valid HTML5, CSS3 and JavaScript. Cross-browser compatible out of the box.</div></div>
+    <div class="feat"><div class="feat-icon">◎</div><div class="feat-title">All Browsers</div><div class="feat-desc">Optimised for Chrome, Firefox, Safari, Opera and Edge.</div></div>
+    <div class="feat"><div class="feat-icon">▲</div><div class="feat-title">Fully Responsive</div><div class="feat-desc">Mobile-first design that adapts beautifully across all screen sizes.</div></div>
+    <div class="feat"><div class="feat-icon">⬡</div><div class="feat-title">Free Returns</div><div class="feat-desc">30-day hassle-free returns on every single piece.</div></div>
+  </div>
+
+  <!-- TESTIMONIAL PREVIEW -->
+  <section class="testimonial-preview">
+    <div>
+      <div class="tp-label">Customer Love</div>
+      <div class="tp-stars">★★★★★</div>
+      <div class="tp-quote">Every piece I've ordered from THREADS has exceeded my expectations. The quality speaks for itself — these are not just T-shirts, they are statements.</div>
+      <div class="tp-author">— Kgomotso M., Gaborone</div>
+      <div class="tp-cta-wrap">
+        <a href="feedback.html" class="btn-gold" style="margin-top:32px;display:inline-block;">Leave a Review</a>
+      </div>
+    </div>
+    <div class="tp-right">
+      <div class="mini-review">
+        <div class="mini-stars">★★★★★</div>
+        <div class="mini-text">The Essentials of God Scripture Tee is everything. The fabric, the print, the fit — absolutely perfect.</div>
+        <div class="mini-author">— Thabo K.</div>
+      </div>
+      <div class="mini-review">
+        <div class="mini-stars">★★★★★</div>
+        <div class="mini-text">Philipp Plein arrived in perfect condition. The skull embroidery is even more impressive in person.</div>
+        <div class="mini-author">— Mpho R.</div>
+      </div>
+      <div class="mini-review">
+        <div class="mini-stars">★★★★☆</div>
+        <div class="mini-text">Fast shipping and the Polo Ralph Lauren polo fits like a dream. Will definitely be ordering again.</div>
+        <div class="mini-author">— Lesego D.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div>
+        <a href="index.html" class="footer-logo">THRE<span>A</span>DS</a>
+        <p class="footer-desc">A curated premium T-shirt destination built to W3C standards, designed for every browser and every screen.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Navigate</h4>
+        <ul class="footer-links">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="threads.html">Collection</a></li>
+          <li><a href="threads.html#brands">Brands</a></li>
+          <li><a href="feedback.html">Reviews</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Help</h4>
+        <ul class="footer-links">
+          <li><a href="#">Sizing Guide</a></li>
+          <li><a href="#">Shipping</a></li>
+          <li><a href="#">Returns</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul class="footer-links">
+          <li><a href="#">About</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Press</a></li>
+          <li><a href="#">Privacy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 THREADS. ALL RIGHTS RESERVED.</div>
+      <div class="footer-socials">
+        <a href="#">Instagram</a>
+        <a href="#">TikTok</a>
+        <a href="#">Twitter</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => {
+      mx = e.clientX; my = e.clientY;
+      cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+    });
+    (function animateRing() {
+      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+      requestAnimationFrame(animateRing);
+    })();
+    document.querySelectorAll('a, button').forEach(el => {
+      el.addEventListener('mouseenter', () => { cursor.style.transform = 'translate(-50%,-50%) scale(2.5)'; ring.style.opacity = '0'; });
+      el.addEventListener('mouseleave', () => { cursor.style.transform = 'translate(-50%,-50%) scale(1)'; ring.style.opacity = '0.6'; });
+    });
+  </script>
 </body>
 </html>
